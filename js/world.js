@@ -162,10 +162,13 @@ class World {
     this.lights = this.initializeLights();
     this.initializeWorld();
 
-    this.raf();
     this.onWindowResize();
 
     this.clock = new THREE.Clock();
+  }
+
+  async init() {
+    const model = this.loadModel('/assets/models/church.glb');
   }
 
   initializeLoadingManager() {
@@ -246,30 +249,33 @@ class World {
     return floor;
   }
 
+  async loadModel() {
+    const gltf = await new GLTFLoader(this.loadingManager).loadAsync('/assets/models/church.glb');
+
+    const mesh = gltf.scene;
+
+    const s = 0.225;
+    mesh.scale.set(s, s, s);
+    mesh.position.y = -10;
+
+    gltf.scene.traverse(function (object) {
+      if (object.isMesh) {
+        object.castShadow = true;
+      }
+    });
+
+    this.scene.add(mesh);
+    return mesh;
+  }
+
   initializeScene() {
     const scene = new THREE.Scene();
 
     scene.background = this.loadSkydome();
     scene.fog = new THREE.Fog(scene.background, 1, 100);
 
-    const floor = loadFloor('/assets/checkerboard.jpg');
+    const floor = this.loadFloor('/assets/checkerboard.jpg');
     scene.add(floor);
-
-    new GLTFLoader(this.loadingManager).load('/assets/models/church.glb', function (gltf) {
-      const mesh = gltf.scene;
-
-      const s = 0.225;
-      mesh.scale.set(s, s, s);
-      mesh.position.y = -10;
-
-      gltf.scene.traverse(function (object) {
-        if (object.isMesh) {
-          object.castShadow = true;
-        }
-      });
-
-      // scene.add(mesh);
-    });
 
     return scene;
   }
@@ -352,8 +358,18 @@ class World {
 }
 
 
-let _APP = null;
+// let _APP = null;
 
-window.addEventListener('DOMContentLoaded', () => {
-  _APP = new World();
-});
+// window.addEventListener('DOMContentLoaded', () => {
+//   _APP = new World();
+// });
+
+async function main() {
+  const world = new World();
+
+  await world.init();
+
+  world.raf();
+}
+
+main();
