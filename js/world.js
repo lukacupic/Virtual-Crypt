@@ -28,7 +28,9 @@ class World {
 
     manager.onLoad = function () {
       const loadingScreen = document.getElementById('loading-screen');
-      // loadingScreen.classList.add('fade-out');
+      loadingScreen.classList.add('fade-out');
+
+      loadingScreen.style.pointerEvents = "none";
     };
 
     manager.onProgress = function (url, itemsLoaded, itemsTotal) {
