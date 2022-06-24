@@ -1,173 +1,26 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js';
-import { OrbitControls } from 'https://unpkg.com/three@0.141.0/examples/jsm/controls/OrbitControls.js';
-import { FirstPersonControls } from 'https://unpkg.com/three@0.141.0/examples/jsm/controls/FirstPersonControls.js';
-import { TransformControls } from 'https://unpkg.com/three@0.141.0/examples/jsm/controls/TransformControls.js';
-import { RectAreaLightHelper } from 'https://unpkg.com/three@0.141.0/examples/jsm/helpers/RectAreaLightHelper.js';
-import { RectAreaLightUniformsLib } from 'https://unpkg.com/three@0.141.0/examples/jsm/lights/RectAreaLightUniformsLib.js';
-import { clamp } from "./utils.js"
-
-class FirstPersonController {
-
-  static KEYS = {
-    forward: 87, // W
-    left: 65,    // A
-    back: 83,    // S
-    right: 68    // D
-  };
-
-  constructor() {
-    this.initialize();
-  }
-
-  initialize() {
-    this.current = {
-      leftButton: false,
-      rightButton: false,
-      mouseX: 0,
-      mouseY: 0,
-      mouseXDelta: 0,
-      mouseYDelta: 0
-    };
-    this.previous = null;
-    this.keys = {};
-
-    document.addEventListener('mousemove', (e) => this.onMouseMove(e), false);
-    document.addEventListener('keydown', (e) => this.onKeyDown(e), false);
-    document.addEventListener('keyup', (e) => this.onKeyUp(e), false);
-  }
-
-  onMouseMove(e) {
-    this.current.mouseX = e.pageX - window.innerWidth / 2;
-    this.current.mouseY = e.pageY - window.innerHeight / 2;
-
-    if (this.previous === null) {
-      this.previous = { ...this.current };
-    }
-
-    this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX;
-    this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY;
-  }
-
-  onKeyDown(e) {
-    this.keys[e.keyCode] = true;
-  }
-
-  onKeyUp(e) {
-    this.keys[e.keyCode] = false;
-  }
-
-  isMovingForward() {
-    return this.keys[FirstPersonController.KEYS.forward];
-  }
-
-  isMovingBackward() {
-    return this.keys[FirstPersonController.KEYS.back];
-  }
-
-  isMovingLeftward() {
-    return this.keys[FirstPersonController.KEYS.left];
-  }
-
-  isMovingRightward() {
-    return this.keys[FirstPersonController.KEYS.right];
-  }
-
-  update() {
-    if (this.previous !== null) {
-      this.current.mouseXDelta = this.current.mouseX - this.previous.mouseX;
-      this.current.mouseYDelta = this.current.mouseY - this.previous.mouseY;
-
-      this.previous = { ...this.current };
-    }
-  }
-}
-
-class FirstPersonCamera {
-
-  constructor(camera, position) {
-    this.camera = camera;
-    this.input = new FirstPersonController();
-    this.rotation = new THREE.Quaternion();
-    this.translation = position;
-    this.phi = 0;
-    this.phiSpeed = 8;
-    this.theta = 0;
-    this.thetaSpeed = 5;
-  }
-
-  // http://gcctech.org/csc/javascript/javascript_keycodes.htm
-  update(timeElapsed) {
-    this.updateRotation(timeElapsed);
-    this.updateTranslation(timeElapsed);
-    this.updateCamera(timeElapsed);
-    this.input.update(timeElapsed);
-  }
-
-  updateRotation() {
-    const xh = this.input.current.mouseXDelta / window.innerWidth;
-    const yh = this.input.current.mouseYDelta / window.innerHeight;
-
-    this.phi += -xh * this.phiSpeed;
-    this.theta = clamp(this.theta + -yh * this.thetaSpeed, -Math.PI / 3, Math.PI / 3);
-
-    const qx = new THREE.Quaternion();
-    qx.setFromAxisAngle(new THREE.Vector3(0, 1, 0), this.phi);
-    const qz = new THREE.Quaternion();
-    qz.setFromAxisAngle(new THREE.Vector3(1, 0, 0), this.theta);
-
-    const q = new THREE.Quaternion();
-    q.multiply(qx);
-    q.multiply(qz);
-
-    this.rotation.copy(q);
-  }
-
-  updateTranslation(timeElapsed) {
-    const forwardVelocity = (this.input.isMovingForward() ? 1 : 0) + (this.input.isMovingBackward() ? -1 : 0);
-    const strafeVelocity = (this.input.isMovingLeftward() ? 1 : 0) + (this.input.isMovingRightward() ? -1 : 0);
-
-    const qx = new THREE.Quaternion();
-    qx.setFromAxisAngle(new THREE.Vector3(0, 1, 0), this.phi);
-
-    const forward = new THREE.Vector3(0, 0, -1);
-    forward.applyQuaternion(qx);
-    forward.multiplyScalar(forwardVelocity * timeElapsed * 10);
-
-    const left = new THREE.Vector3(-1, 0, 0);
-    left.applyQuaternion(qx);
-    left.multiplyScalar(strafeVelocity * timeElapsed * 10);
-
-    this.translation.add(forward);
-    this.translation.add(left);
-  }
-
-  updateCamera() {
-    this.camera.quaternion.copy(this.rotation);
-    this.camera.position.copy(this.translation);
-  }
-}
+import { PointerLockControls } from 'https://unpkg.com/three@0.141.0/examples/jsm/controls/PointerLockControls.js';
 
 class World {
 
   constructor() {
-    this.initialize();
-  }
-
-  initialize() {
     this.loadingManager = this.initializeLoadingManager();
     this.renderer = this.initializeRenderer();
     this.scene = this.initializeScene();
     this.camera = this.initializeCamera();
+    this.controls = this.initializeControls();
     this.lights = this.initializeLights();
-    this.initializeWorld();
 
-    this.onWindowResize();
+    this.velocity = new THREE.Vector3();
+    this.direction = new THREE.Vector3();
 
     this.clock = new THREE.Clock();
+
+    window.addEventListener('resize', this.onWindowResize);
   }
 
-  async init() {
+  async initialize() {
     const model = this.loadModel('/assets/models/church.glb');
   }
 
@@ -227,17 +80,17 @@ class World {
   }
 
   loadFloor(texturePath) {
-    const mapLoader = new THREE.TextureLoader(this.loadingManager);
-    const checkerboard = mapLoader.load(texturePath);
+    const textureLoader = new THREE.TextureLoader(this.loadingManager);
+    const floorTexture = textureLoader.load(texturePath);
 
     const maxAnisotropy = this.renderer.capabilities.getMaxAnisotropy();
-    checkerboard.anisotropy = maxAnisotropy;
-    checkerboard.wrapS = THREE.RepeatWrapping;
-    checkerboard.wrapT = THREE.RepeatWrapping;
-    checkerboard.repeat.set(256, 256);
-    checkerboard.encoding = THREE.sRGBEncoding;
+    floorTexture.anisotropy = maxAnisotropy;
+    floorTexture.wrapS = THREE.RepeatWrapping;
+    floorTexture.wrapT = THREE.RepeatWrapping;
+    floorTexture.repeat.set(256, 256);
+    floorTexture.encoding = THREE.sRGBEncoding;
 
-    const floorMaterial = new THREE.MeshStandardMaterial({ map: checkerboard });
+    const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
     floorMaterial.color.setHSL(0.095, 1, 0.75);
 
     const floorGeometry = new THREE.PlaneBufferGeometry(1000, 1000, 10, 10);
@@ -250,15 +103,14 @@ class World {
   }
 
   async loadModel() {
-    const gltf = await new GLTFLoader(this.loadingManager).loadAsync('/assets/models/church.glb');
-
-    const mesh = gltf.scene;
+    const model = await new GLTFLoader(this.loadingManager).loadAsync('/assets/models/church.glb');
+    const mesh = model.scene;
 
     const s = 0.225;
     mesh.scale.set(s, s, s);
     mesh.position.y = -10;
 
-    gltf.scene.traverse(function (object) {
+    model.scene.traverse(function (object) {
       if (object.isMesh) {
         object.castShadow = true;
       }
@@ -272,9 +124,9 @@ class World {
     const scene = new THREE.Scene();
 
     scene.background = this.loadSkydome();
-    scene.fog = new THREE.Fog(scene.background, 1, 100);
+    scene.fog = new THREE.Fog(scene.background, 1, 500);
 
-    const floor = this.loadFloor('/assets/checkerboard.jpg');
+    const floor = this.loadFloor('/assets/floor.jpg');
     scene.add(floor);
 
     return scene;
@@ -286,54 +138,143 @@ class World {
     const near = 1.0;
     const far = 1000.0;
 
-    return new THREE.PerspectiveCamera(fov, aspect, near, far);
+    const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+    camera.position.y = 2;
+
+    return camera;
   }
 
-  initializeLights() {
-    const light = new THREE.AmbientLight(0xf5ffbd, 0.5);
-    this.scene.add(light);
+  initializeControls() {
+    const controls = new PointerLockControls(this.camera, document.body);
 
-    const hemiLight = new THREE.HemisphereLight(0xffffbb, 0xf9ffbd, 1);
-    this.scene.add(hemiLight);
+    const blocker = document.getElementById('blocker');
+    const instructions = document.getElementById('instructions');
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 4);
-    dirLight.color.setHSL(0.1, 1, 0.95);
-    dirLight.position.set(- 1, 1.75, 1);
-    dirLight.position.multiplyScalar(30);
-    this.scene.add(dirLight);
+    instructions.addEventListener('click', function () {
+      controls.lock();
+    });
 
-    dirLight.castShadow = true;
+    controls.addEventListener('lock', function () {
+      instructions.style.display = 'none';
+      blocker.style.display = 'none';
+    });
 
-    dirLight.shadow.mapSize.width = 2048;
-    dirLight.shadow.mapSize.height = 2048;
+    controls.addEventListener('unlock', function () {
+      blocker.style.display = 'block';
+      instructions.style.display = '';
+    });
+
+    const onKeyDown = function (event) {
+      switch (event.code) {
+        case 'ArrowUp':
+        case 'KeyW':
+          this.moveForward = true;
+          break;
+
+        case 'ArrowLeft':
+        case 'KeyA':
+          this.moveLeft = true;
+          break;
+
+        case 'ArrowDown':
+        case 'KeyS':
+          this.moveBackward = true;
+          break;
+
+        case 'ArrowRight':
+        case 'KeyD':
+          this.moveRight = true;
+          break;
+      }
+    };
+
+    const onKeyUp = function (event) {
+      switch (event.code) {
+
+        case 'ArrowUp':
+        case 'KeyW':
+          this.moveForward = false;
+          break;
+
+        case 'ArrowLeft':
+        case 'KeyA':
+          this.moveLeft = false;
+          break;
+
+        case 'ArrowDown':
+        case 'KeyS':
+          this.moveBackward = false;
+          break;
+
+        case 'ArrowRight':
+        case 'KeyD':
+          this.moveRight = false;
+          break;
+      }
+    };
+
+    document.addEventListener('keydown', onKeyDown);
+    document.addEventListener('keyup', onKeyUp);
+
+    this.scene.add(controls.getObject());
+
+    return controls;
+  }
+
+  createAmbientLight() {
+    return new THREE.AmbientLight(0xf5ffbd, 0.5);
+  }
+
+  createHemisphereLight() {
+    return new THREE.HemisphereLight(0xffffbb, 0xf9ffbd, 1);
+  }
+
+  createDirectionalLight() {
+    const directionalLight = new THREE.DirectionalLight(0xffffff, 4);
+
+    directionalLight.color.setHSL(0.1, 1, 0.95);
+    directionalLight.position.set(- 1, 1.75, 1);
+    directionalLight.position.multiplyScalar(30);
+
+    directionalLight.castShadow = true;
+    directionalLight.shadow.mapSize.width = 2048;
+    directionalLight.shadow.mapSize.height = 2048;
 
     const d = 100;
 
-    dirLight.shadow.camera.left = - d;
-    dirLight.shadow.camera.right = d;
-    dirLight.shadow.camera.top = d;
-    dirLight.shadow.camera.bottom = - d;
+    directionalLight.shadow.camera.left = - d;
+    directionalLight.shadow.camera.right = d;
+    directionalLight.shadow.camera.top = d;
+    directionalLight.shadow.camera.bottom = - d;
 
-    dirLight.shadow.camera.far = 3500;
-    dirLight.shadow.bias = - 0.0001;
+    directionalLight.shadow.camera.far = 3500;
+    directionalLight.shadow.bias = - 0.0001;
 
+    return directionalLight;
+  }
 
-    let bulbGeometry = new THREE.SphereGeometry(0.02, 16, 8);
-    let bulbLight = new THREE.PointLight(0xffee88, 100, 20, 2);
+  createPointLight() {
+    const bulbGeometry = new THREE.SphereGeometry(0.02, 16, 8);
 
-    let bulbMat = new THREE.MeshStandardMaterial({
+    const bulbMaterial = new THREE.MeshStandardMaterial({
       emissive: 0xffffee,
       emissiveIntensity: 1,
       color: 0x000000
     });
-    bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMat));
+
+    const bulbLight = new THREE.PointLight(0xffee88, 100, 20, 2);
+    bulbLight.add(new THREE.Mesh(bulbGeometry, bulbMaterial));
     bulbLight.position.set(0, 2, 0);
     bulbLight.castShadow = true;
-    this.scene.add(bulbLight);
+
+    return bulbLight;
   }
 
-  initializeWorld() {
-    this.fpsCamera = new FirstPersonCamera(this.camera, new THREE.Vector3(0, 2, 20));
+  initializeLights() {
+    this.scene.add(this.createAmbientLight());
+    this.scene.add(this.createHemisphereLight());
+    this.scene.add(this.createDirectionalLight());
+    this.scene.add(this.createPointLight());
   }
 
   onWindowResize() {
@@ -342,34 +283,36 @@ class World {
     this.renderer.setSize(window.innerWidth, window.innerHeight);
   }
 
-  raf() {
+  animate() {
     requestAnimationFrame((t) => {
-      this.step_();
-      this.renderer.autoClear = true;
-      this.renderer.render(this.scene, this.camera);
-      this.renderer.autoClear = false;
-      this.raf();
+      if (this.controls.isLocked === true) {
+        const delta = this.clock.getDelta();
+
+        this.velocity.x -= this.velocity.x * 10.0 * delta;
+        this.velocity.z -= this.velocity.z * 10.0 * delta;
+
+        this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
+        this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
+        this.direction.normalize();
+
+        if (this.moveForward || this.moveBackward) this.velocity.z -= this.direction.z * 400.0 * delta;
+        if (this.moveLeft || this.moveRight) this.velocity.x -= this.direction.x * 400.0 * delta;
+
+        this.controls.moveRight(-this.velocity.x * delta);
+        this.controls.moveForward(-this.velocity.z * delta);
+
+        this.renderer.render(this.scene, this.camera);
+      }
     });
   }
-
-  step_() {
-    this.fpsCamera.update(this.clock.getDelta());
-  }
 }
-
-
-// let _APP = null;
-
-// window.addEventListener('DOMContentLoaded', () => {
-//   _APP = new World();
-// });
 
 async function main() {
   const world = new World();
 
-  await world.init();
+  await world.initialize();
 
-  world.raf();
+  world.animate();
 }
 
 main();
