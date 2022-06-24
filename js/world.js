@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js';
-import { PointerLockControls } from 'https://unpkg.com/three@0.141.0/examples/jsm/controls/PointerLockControls.js';
+import { FirstPersonController } from './controller.js';
 
 class World {
 
@@ -11,13 +11,9 @@ class World {
     this.camera = this.initializeCamera();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
+    this.clock = this.initializeClock();
 
-    this.velocity = new THREE.Vector3();
-    this.direction = new THREE.Vector3();
-
-    this.clock = new THREE.Clock();
-
-    window.addEventListener('resize', this.onWindowResize);
+    this.onWindowResize();
   }
 
   async initialize() {
@@ -32,7 +28,7 @@ class World {
 
     manager.onLoad = function () {
       const loadingScreen = document.getElementById('loading-screen');
-      loadingScreen.classList.add('fade-out');
+      // loadingScreen.classList.add('fade-out');
     };
 
     manager.onProgress = function (url, itemsLoaded, itemsTotal) {
@@ -85,10 +81,10 @@ class World {
 
     const maxAnisotropy = this.renderer.capabilities.getMaxAnisotropy();
     floorTexture.anisotropy = maxAnisotropy;
+    floorTexture.encoding = THREE.sRGBEncoding;
     floorTexture.wrapS = THREE.RepeatWrapping;
     floorTexture.wrapT = THREE.RepeatWrapping;
     floorTexture.repeat.set(256, 256);
-    floorTexture.encoding = THREE.sRGBEncoding;
 
     const floorMaterial = new THREE.MeshStandardMaterial({ map: floorTexture });
     floorMaterial.color.setHSL(0.095, 1, 0.75);
@@ -126,7 +122,7 @@ class World {
     scene.background = this.loadSkydome();
     scene.fog = new THREE.Fog(scene.background, 1, 500);
 
-    const floor = this.loadFloor('/assets/floor.jpg');
+    const floor = this.loadFloor('/assets/textures/floor.jpg');
     scene.add(floor);
 
     return scene;
@@ -145,80 +141,7 @@ class World {
   }
 
   initializeControls() {
-    const controls = new PointerLockControls(this.camera, document.body);
-
-    const blocker = document.getElementById('blocker');
-    const instructions = document.getElementById('instructions');
-
-    instructions.addEventListener('click', function () {
-      controls.lock();
-    });
-
-    controls.addEventListener('lock', function () {
-      instructions.style.display = 'none';
-      blocker.style.display = 'none';
-    });
-
-    controls.addEventListener('unlock', function () {
-      blocker.style.display = 'block';
-      instructions.style.display = '';
-    });
-
-    const onKeyDown = function (event) {
-      switch (event.code) {
-        case 'ArrowUp':
-        case 'KeyW':
-          this.moveForward = true;
-          break;
-
-        case 'ArrowLeft':
-        case 'KeyA':
-          this.moveLeft = true;
-          break;
-
-        case 'ArrowDown':
-        case 'KeyS':
-          this.moveBackward = true;
-          break;
-
-        case 'ArrowRight':
-        case 'KeyD':
-          this.moveRight = true;
-          break;
-      }
-    };
-
-    const onKeyUp = function (event) {
-      switch (event.code) {
-
-        case 'ArrowUp':
-        case 'KeyW':
-          this.moveForward = false;
-          break;
-
-        case 'ArrowLeft':
-        case 'KeyA':
-          this.moveLeft = false;
-          break;
-
-        case 'ArrowDown':
-        case 'KeyS':
-          this.moveBackward = false;
-          break;
-
-        case 'ArrowRight':
-        case 'KeyD':
-          this.moveRight = false;
-          break;
-      }
-    };
-
-    document.addEventListener('keydown', onKeyDown);
-    document.addEventListener('keyup', onKeyUp);
-
-    this.scene.add(controls.getObject());
-
-    return controls;
+    return new FirstPersonController(this.camera, document, 15.0);
   }
 
   createAmbientLight() {
@@ -277,6 +200,10 @@ class World {
     this.scene.add(this.createPointLight());
   }
 
+  initializeClock() {
+    return new THREE.Clock();
+  }
+
   onWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
@@ -285,24 +212,9 @@ class World {
 
   animate() {
     requestAnimationFrame((t) => {
-      if (this.controls.isLocked === true) {
-        const delta = this.clock.getDelta();
-
-        this.velocity.x -= this.velocity.x * 10.0 * delta;
-        this.velocity.z -= this.velocity.z * 10.0 * delta;
-
-        this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
-        this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
-        this.direction.normalize();
-
-        if (this.moveForward || this.moveBackward) this.velocity.z -= this.direction.z * 400.0 * delta;
-        if (this.moveLeft || this.moveRight) this.velocity.x -= this.direction.x * 400.0 * delta;
-
-        this.controls.moveRight(-this.velocity.x * delta);
-        this.controls.moveForward(-this.velocity.z * delta);
-
-        this.renderer.render(this.scene, this.camera);
-      }
+      this.controls.update(this.clock.getDelta());
+      this.renderer.render(this.scene, this.camera);
+      this.animate();
     });
   }
 }

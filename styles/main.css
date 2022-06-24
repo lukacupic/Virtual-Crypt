@@ -5,9 +5,15 @@
 body {
   margin: 0;
   overflow: hidden;
+  background-color: #000;
+  color: #ffffff;
+  font-family: Monospace;
+  font-size: 13px;
+  line-height: 24px;
+  overscroll-behavior: none;
 }
 
-#loading-screen {
+/* #loading-screen {
   position: absolute;
   z-index: 2;
   top: 0;
@@ -92,8 +98,25 @@ body {
     -ms-transform: rotate(360deg);
     transform: rotate(360deg);
   }
+} */
+
+a,
+button,
+input,
+select {
+  pointer-events: auto;
 }
 
+@media all and (max-width: 640px) {
+  .lil-gui.root {
+    right: auto;
+    top: auto;
+    max-height: 50%;
+    max-width: 80%;
+    bottom: 0;
+    left: 0;
+  }
+}
 
 #blocker {
   position: absolute;
