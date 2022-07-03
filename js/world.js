@@ -134,7 +134,7 @@ class World {
 
   async initialize() {
     // const model = this.loadModel("/assets/models/church-alpha.glb");
-    const model = this.loadModel("/assets/models/flamingo.glb");
+    const model = this.loadModel("/assets/models/crypt.glb");
   }
 
   initializePhysicsManager() {
@@ -220,9 +220,10 @@ class World {
       modelPath
     );
     let mesh = model.scene;
-    mesh.position.y = 100;
+    mesh.position.y = 0;
 
     const s = 0.25;
+    console.log(mesh);
     mesh.children[0].geometry.scale(s, s, s);
 
     model.scene.traverse((object) => {
@@ -233,7 +234,7 @@ class World {
     });
 
     const rbModel = new RigidBody();
-    const modelMass = 1;
+    const modelMass = 0;
     rbModel.createObject(
       modelMass,
       model.scene.children[0].geometry,
@@ -314,9 +315,9 @@ class World {
     this.physicsManager.addRigidBody(floor, rbFloor, floorMass);
     scene.add(floor);
 
-    const [boxMesh, rbBox, boxMass] = this.initializeBox();
-    this.physicsManager.addRigidBody(boxMesh, rbBox, boxMass);
-    scene.add(boxMesh);
+    // const [boxMesh, rbBox, boxMass] = this.initializeBox();
+    // this.physicsManager.addRigidBody(boxMesh, rbBox, boxMass);
+    // scene.add(boxMesh);
 
     return scene;
   }
