@@ -390,7 +390,7 @@ class World {
       color: 0x000000,
     });
 
-    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    const bulbLight = new Three.PointLight(0xffee88, 80, 40, 2);
     bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
     bulbLight.position.set(-13.1, 10, -45);
     bulbLight.castShadow = true;
@@ -408,7 +408,7 @@ class World {
       color: 0x000000,
     });
 
-    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    const bulbLight = new Three.PointLight(0xffee88, 80, 40, 2);
     bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
     bulbLight.position.set(-13.1, 10, 4);
     bulbLight.castShadow = true;
@@ -426,7 +426,7 @@ class World {
       color: 0x000000,
     });
 
-    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    const bulbLight = new Three.PointLight(0xffee88, 80, 40, 2);
     bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
     bulbLight.position.set(-13.1, 10, -116.75);
     bulbLight.castShadow = true;
@@ -444,7 +444,7 @@ class World {
       color: 0x000000,
     });
 
-    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    const bulbLight = new Three.PointLight(0xffee88, 80, 40, 2);
     bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
     bulbLight.position.set(-49, 8, -81);
     bulbLight.castShadow = true;
@@ -462,7 +462,7 @@ class World {
       color: 0x000000,
     });
 
-    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    const bulbLight = new Three.PointLight(0xffee88, 80, 40, 2);
     bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
     bulbLight.position.set(23.75, 10, -81);
     bulbLight.castShadow = true;
@@ -493,7 +493,7 @@ class World {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.5);
-      sound.play();
+      // sound.play();
     });
   }
 
@@ -512,7 +512,7 @@ class World {
       const delta = this.clock.getDelta();
 
       this.physicsManager.update(delta);
-      this.controls.update(delta, this.bjects);
+      this.controls.update(delta, this.objects);
       this.renderer.render(this.scene, this.camera);
       this.animate();
     });

@@ -101,14 +101,14 @@ export class FirstPersonController {
   update(delta, objects) {
     if (this.controls.isLocked === false) return;
 
-    // // raycast
-    // this.raycaster.ray.origin.copy(this.controls.getObject().position);
-    // // this.raycaster.ray.origin.y -= 10;
+    this.raycaster.setFromCamera(new THREE.Vector2(0.5, 0.5), this.camera);
+    this.raycaster.far = 1;
+    const intersects = this.raycaster.intersectObjects(objects);
 
-    // const intersections = this.raycaster.intersectObjects(objects, false);
-    // if (intersections && intersections.length > 0) {
-    //   console.log("rayyyyyyyyy");
-    // }
+    for (let i = 0; i < intersects.length; i++) {
+      console.log("collision with object");
+      this.velocity.set(0, 0, 0);
+    }
 
     this.velocity.x -= this.velocity.x * 10.0 * delta;
     this.velocity.z -= this.velocity.z * 10.0 * delta;
