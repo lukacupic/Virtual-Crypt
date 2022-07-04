@@ -120,6 +120,7 @@ class RigidBody {
 
 class World {
   constructor() {
+    this.objects = [];
     this.physicsManager = this.initializePhysicsManager();
     this.loadingManager = this.initializeLoadingManager();
     this.renderer = this.initializeRenderer();
@@ -127,13 +128,13 @@ class World {
     this.camera = this.initializeCamera();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
+    this.audioListener = this.initializeAudioListener();
     this.clock = this.initializeClock();
 
     this.onWindowResize();
   }
 
   async initialize() {
-    // const model = this.loadModel("/assets/models/church-alpha.glb");
     const model = this.loadModel("/assets/models/crypt.glb");
   }
 
@@ -163,7 +164,7 @@ class World {
   }
 
   initializeRenderer() {
-    const renderer = new Three.WebGLRenderer({ antialias: false });
+    const renderer = new Three.WebGLRenderer({ antialias: true });
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -210,7 +211,7 @@ class World {
     const floorMaterial = new Three.MeshStandardMaterial({ map: floorTexture });
     floorMaterial.color.setHSL(0.095, 1, 0.75);
 
-    const floorGeometry = new Three.PlaneBufferGeometry(100, 100, 10, 10);
+    const floorGeometry = new Three.PlaneBufferGeometry(1000, 1000, 10, 10);
 
     return new Three.Mesh(floorGeometry, floorMaterial);
   }
@@ -219,12 +220,12 @@ class World {
     const model = await new GLTFLoader(this.loadingManager).loadAsync(
       modelPath
     );
+
     let mesh = model.scene;
     mesh.position.y = 0;
 
-    const s = 0.25;
-    console.log(mesh);
-    mesh.children[0].geometry.scale(s, s, s);
+    const s = 0.4;
+    mesh.scale.set(s, s, s);
 
     model.scene.traverse((object) => {
       if (object.isMesh) {
@@ -232,22 +233,24 @@ class World {
         object.receiveShadow = true;
       }
     });
-
-    const rbModel = new RigidBody();
-    const modelMass = 0;
-    rbModel.createObject(
-      modelMass,
-      model.scene.children[0].geometry,
+    const glassMesh = mesh.getObjectByName("Mesh160Mesh").geometry;
+    const glassMass = 0;
+    const glassModel = new RigidBody();
+    glassModel.createObject(
+      glassMass,
+      glassMesh,
       mesh.position,
       mesh.quaternion
     );
 
-    rbModel.setRestitution(0.2);
-    rbModel.setFriction(1);
-    rbModel.setRollingFriction(5);
+    glassModel.setRestitution(0.2);
+    glassModel.setFriction(1);
+    glassModel.setRollingFriction(5);
 
-    this.physicsManager.addRigidBody(mesh, rbModel, modelMass);
     this.scene.add(mesh);
+    this.physicsManager.addRigidBody(mesh, glassModel, glassMass);
+
+    this.objects.push(mesh);
 
     return mesh;
   }
@@ -281,10 +284,10 @@ class World {
   initializeBox() {
     const boxMesh = new Three.Mesh(
       new Three.BoxGeometry(4, 4, 4),
-      new Three.MeshStandardMaterial({ color: 0x808080 })
+      new Three.MeshStandardMaterial({ color: 0x808080, wireframe: true })
     );
 
-    boxMesh.position.set(0, 40, 0);
+    boxMesh.position.set(4, 5, 0);
     boxMesh.rotateX(Math.PI / 3);
     boxMesh.castShadow = true;
     boxMesh.receiveShadow = true;
@@ -315,9 +318,12 @@ class World {
     this.physicsManager.addRigidBody(floor, rbFloor, floorMass);
     scene.add(floor);
 
-    // const [boxMesh, rbBox, boxMass] = this.initializeBox();
-    // this.physicsManager.addRigidBody(boxMesh, rbBox, boxMass);
-    // scene.add(boxMesh);
+    const [boxMesh, rbBox, boxMass] = this.initializeBox();
+    this.physicsManager.addRigidBody(boxMesh, rbBox, boxMass);
+    this.box = boxMesh;
+    scene.add(boxMesh);
+
+    this.objects.push(boxMesh);
 
     return scene;
   }
@@ -329,12 +335,9 @@ class World {
     const far = 1000.0;
 
     const camera = new Three.PerspectiveCamera(fov, aspect, near, far);
-    camera.position.x = 30;
+    camera.position.x = -13;
     camera.position.y = 3;
-    camera.position.z = 30;
-
-    const Y_AXIS = new Three.Vector3(0, 1, 0);
-    camera.rotateOnAxis(Y_AXIS, Math.PI / 4);
+    camera.position.z = 10;
 
     return camera;
   }
@@ -344,7 +347,7 @@ class World {
   }
 
   createAmbientLight() {
-    return new Three.AmbientLight(0xf5ffbd, 0.5);
+    return new Three.AmbientLight(0xf5ffbd, 0.01);
   }
 
   createHemisphereLight() {
@@ -352,15 +355,15 @@ class World {
   }
 
   createDirectionalLight() {
-    const directionalLight = new Three.DirectionalLight(0xffffff, 4);
+    const directionalLight = new Three.DirectionalLight(0xffffff, 3);
 
     directionalLight.color.setHSL(0.1, 1, 0.95);
     directionalLight.position.set(1, 2, -1);
     directionalLight.position.multiplyScalar(30);
 
     directionalLight.castShadow = true;
-    directionalLight.shadow.mapSize.width = 2048;
-    directionalLight.shadow.mapSize.height = 2048;
+    directionalLight.shadow.mapSize.width = 1024;
+    directionalLight.shadow.mapSize.height = 1024;
 
     const d = 100;
 
@@ -369,14 +372,17 @@ class World {
     directionalLight.shadow.camera.top = d;
     directionalLight.shadow.camera.bottom = -d;
 
+    directionalLight.shadow.camera.near = 1;
     directionalLight.shadow.camera.far = 3500;
-    directionalLight.shadow.bias = -0.0001;
+    directionalLight.shadow.bias = -0.00004;
+
+    directionalLight.target.updateMatrixWorld();
 
     return directionalLight;
   }
 
-  createPointLight() {
-    const bulbGeometry = new Three.SphereGeometry(0.02, 16, 8);
+  createPointLight1() {
+    const bulbGeometry = new Three.SphereGeometry(0.0, 16, 8);
 
     const bulbMaterial = new Three.MeshStandardMaterial({
       emissive: 0xffffee,
@@ -384,19 +390,111 @@ class World {
       color: 0x000000,
     });
 
-    const bulbLight = new Three.PointLight(0xffee88, 100, 20, 2);
+    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
     bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
-    bulbLight.position.set(0, 2, 0);
+    bulbLight.position.set(-13.1, 10, -45);
     bulbLight.castShadow = true;
+    bulbLight.shadow.bias = -0.5;
+
+    return bulbLight;
+  }
+
+  createPointLight2() {
+    const bulbGeometry = new Three.SphereGeometry(0.0, 16, 8);
+
+    const bulbMaterial = new Three.MeshStandardMaterial({
+      emissive: 0xffffee,
+      emissiveIntensity: 1,
+      color: 0x000000,
+    });
+
+    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
+    bulbLight.position.set(-13.1, 10, 4);
+    bulbLight.castShadow = true;
+    bulbLight.shadow.bias = -0.5;
+
+    return bulbLight;
+  }
+
+  createPointLight3() {
+    const bulbGeometry = new Three.SphereGeometry(0.0, 16, 8);
+
+    const bulbMaterial = new Three.MeshStandardMaterial({
+      emissive: 0xffffee,
+      emissiveIntensity: 1,
+      color: 0x000000,
+    });
+
+    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
+    bulbLight.position.set(-13.1, 10, -116.75);
+    bulbLight.castShadow = true;
+    bulbLight.shadow.bias = -0.5;
+
+    return bulbLight;
+  }
+
+  createPointLight4() {
+    const bulbGeometry = new Three.SphereGeometry(0.0, 16, 8);
+
+    const bulbMaterial = new Three.MeshStandardMaterial({
+      emissive: 0xffffee,
+      emissiveIntensity: 1,
+      color: 0x000000,
+    });
+
+    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
+    bulbLight.position.set(-49, 8, -81);
+    bulbLight.castShadow = true;
+    bulbLight.shadow.bias = -0.5;
+
+    return bulbLight;
+  }
+
+  createPointLight5() {
+    const bulbGeometry = new Three.SphereGeometry(0.0, 16, 8);
+
+    const bulbMaterial = new Three.MeshStandardMaterial({
+      emissive: 0xffffee,
+      emissiveIntensity: 1,
+      color: 0x000000,
+    });
+
+    const bulbLight = new Three.PointLight(0x750000, 30, 40, 2);
+    bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
+    bulbLight.position.set(23.75, 10, -81);
+    bulbLight.castShadow = true;
+    bulbLight.shadow.bias = -0.5;
 
     return bulbLight;
   }
 
   initializeLights() {
     this.scene.add(this.createAmbientLight());
-    this.scene.add(this.createHemisphereLight());
-    this.scene.add(this.createDirectionalLight());
-    this.scene.add(this.createPointLight());
+    // this.scene.add(this.createHemisphereLight());
+    // this.scene.add(this.createDirectionalLight());
+    this.scene.add(this.createPointLight1());
+    this.scene.add(this.createPointLight2());
+    this.scene.add(this.createPointLight3());
+    this.scene.add(this.createPointLight4());
+    this.scene.add(this.createPointLight5());
+  }
+
+  initializeAudioListener() {
+    const listener = new Three.AudioListener();
+    this.camera.add(listener);
+
+    const sound = new Three.Audio(listener);
+
+    const audioLoader = new Three.AudioLoader();
+    audioLoader.load("/assets/sounds/choir.ogg", function (buffer) {
+      sound.setBuffer(buffer);
+      sound.setLoop(true);
+      sound.setVolume(0.5);
+      sound.play();
+    });
   }
 
   initializeClock() {
@@ -414,7 +512,7 @@ class World {
       const delta = this.clock.getDelta();
 
       this.physicsManager.update(delta);
-      this.controls.update(delta);
+      this.controls.update(delta, this.bjects);
       this.renderer.render(this.scene, this.camera);
       this.animate();
     });
