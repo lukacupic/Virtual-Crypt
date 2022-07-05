@@ -1,122 +1,8 @@
 import * as Three from "three";
 import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
+import { Octree } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Octree.js";
+import { Capsule } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Capsule.js";
 import { FirstPersonController } from "./controller.js";
-import { PhysicsManager } from "./physics.js";
-
-class RigidBody {
-  constructor() {}
-
-  setRestitution(val) {
-    this.body.setRestitution(val);
-  }
-
-  setFriction(val) {
-    this.body.setFriction(val);
-  }
-
-  setRollingFriction(val) {
-    this.body.setRollingFriction(val);
-  }
-
-  createBox(mass, pos, quat, size) {
-    this.transform = new Ammo.btTransform();
-    this.transform.setIdentity();
-    this.transform.setOrigin(new Ammo.btVector3(pos.x, pos.y, pos.z));
-    this.transform.setRotation(
-      new Ammo.btQuaternion(quat.x, quat.y, quat.z, quat.w)
-    );
-    this.motionState = new Ammo.btDefaultMotionState(this.transform);
-
-    const btSize = new Ammo.btVector3(size.x * 0.5, size.y * 0.5, size.z * 0.5);
-    this.shape = new Ammo.btBoxShape(btSize);
-    this.shape.setMargin(0.05);
-
-    this.inertia = new Ammo.btVector3(0, 0, 0);
-    if (mass > 0) {
-      this.shape.calculateLocalInertia(mass, this.inertia);
-    }
-
-    this.info = new Ammo.btRigidBodyConstructionInfo(
-      mass,
-      this.motionState,
-      this.shape,
-      this.inertia
-    );
-    this.body = new Ammo.btRigidBody(this.info);
-
-    Ammo.destroy(btSize);
-  }
-
-  createObject(mass, geometry, position, quaternion) {
-    this.transform = new Ammo.btTransform();
-    this.transform.setIdentity();
-    this.transform.setOrigin(
-      new Ammo.btVector3(position.x, position.y, position.z)
-    );
-    this.transform.setRotation(
-      new Ammo.btQuaternion(
-        quaternion.x,
-        quaternion.y,
-        quaternion.z,
-        quaternion.w
-      )
-    );
-    this.motionState = new Ammo.btDefaultMotionState(this.transform);
-
-    this.shape = new Ammo.btConvexHullShape();
-
-    this.vectA = new Ammo.btVector3(0, 0, 0);
-    this.vectB = new Ammo.btVector3(0, 0, 0);
-    this.vectC = new Ammo.btVector3(0, 0, 0);
-
-    this.verticesPos = geometry.getAttribute("position").array;
-    this.triangles = [];
-    for (let i = 0; i < this.verticesPos.length; i += 3) {
-      this.triangles.push({
-        x: this.verticesPos[i],
-        y: this.verticesPos[i + 1],
-        z: this.verticesPos[i + 2],
-      });
-    }
-
-    for (let i = 0; i < this.triangles.length - 3; i += 3) {
-      this.vectA.setX(this.triangles[i].x);
-      this.vectA.setY(this.triangles[i].y);
-      this.vectA.setZ(this.triangles[i].z);
-      this.shape.addPoint(this.vectA, true);
-
-      this.vectB.setX(this.triangles[i + 1].x);
-      this.vectB.setY(this.triangles[i + 1].y);
-      this.vectB.setZ(this.triangles[i + 1].z);
-      this.shape.addPoint(this.vectB, true);
-
-      this.vectC.setX(this.triangles[i + 2].x);
-      this.vectC.setY(this.triangles[i + 2].y);
-      this.vectC.setZ(this.triangles[i + 2].z);
-      this.shape.addPoint(this.vectC, true);
-    }
-
-    this.shape.setMargin(0.05);
-
-    this.inertia = new Ammo.btVector3(0, 0, 0);
-    if (mass > 0) {
-      this.shape.calculateLocalInertia(mass, this.inertia);
-    }
-
-    this.info = new Ammo.btRigidBodyConstructionInfo(
-      mass,
-      this.motionState,
-      this.shape,
-      this.inertia
-    );
-
-    this.body = new Ammo.btRigidBody(this.info);
-
-    Ammo.destroy(this.vectA);
-    Ammo.destroy(this.vectB);
-    Ammo.destroy(this.vectC);
-  }
-}
 
 class World {
   constructor() {
@@ -129,11 +15,18 @@ class World {
     this.audioListener = this.initializeAudioListener();
     this.clock = this.initializeClock();
 
+    this.worldOctree = new Octree();
+    this.playerCollider = new Capsule(
+      new Three.Vector3(0, 0.35, 0),
+      new Three.Vector3(0, 1, 0),
+      0.35
+    );
+
     this.onWindowResize();
   }
 
   async initialize() {
-    const model = this.loadModel("/assets/models/crypt.glb");
+    const model = this.loadModel("/assets/models/crypt-glass.glb");
   }
 
   initializeLoadingManager() {
@@ -215,11 +108,11 @@ class World {
       modelPath
     );
 
-    let cryptMesh = model.scene;
-    cryptMesh.position.y = 0;
+    let mesh = model.scene;
+    mesh.position.y = 0;
 
     const s = 0.4;
-    cryptMesh.scale.set(s, s, s);
+    mesh.scale.set(s, s, s);
 
     model.scene.traverse((node) => {
       if (node.isMesh) {
@@ -229,9 +122,10 @@ class World {
       }
     });
 
-    this.scene.add(cryptMesh);
+    this.worldOctree.fromGraphNode(mesh);
+    this.scene.add(mesh);
 
-    return cryptMesh;
+    return mesh;
   }
 
   initializeGround() {

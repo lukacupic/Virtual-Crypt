@@ -91,23 +91,49 @@ export class FirstPersonController {
     return controls;
   }
 
+  // updatePlayer(delta) {
+  //   const deltaPosition = this.controls.velocity.clone().multiplyScalar(delta);
+  //   this.playerCollider.translate(deltaPosition);
+
+  //   playerCollisions();
+  // }
+
+  // playerCollisions() {
+  //   const result = this.worldOctree.capsuleIntersect(this.playerCollider);
+
+  //   playerOnFloor = false;
+
+  //   if (result) {
+  //     playerOnFloor = result.normal.y > 0;
+
+  //     if (!playerOnFloor) {
+  //       playerVelocity.addScaledVector(
+  //         result.normal,
+  //         -result.normal.dot(playerVelocity)
+  //       );
+  //     }
+
+  //     playerCollider.translate(result.normal.multiplyScalar(result.depth));
+  //   }
+  // }
+
   update(delta) {
     if (this.controls.isLocked === false) return;
 
     this.velocity.x -= this.velocity.x * 10.0 * delta;
     this.velocity.z -= this.velocity.z * 10.0 * delta;
 
-    this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
     this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
+    this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
 
     this.direction.normalize();
 
-    if (this.moveForward || this.moveBackward) {
-      this.velocity.z -= this.direction.z * 10 * this.speed * delta;
-    }
-
     if (this.moveLeft || this.moveRight) {
       this.velocity.x -= this.direction.x * 10 * this.speed * delta;
+    }
+
+    if (this.moveForward || this.moveBackward) {
+      this.velocity.z -= this.direction.z * 10 * this.speed * delta;
     }
 
     this.controls.moveRight(-this.velocity.x * delta);
