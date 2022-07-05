@@ -120,7 +120,6 @@ class RigidBody {
 
 class World {
   constructor() {
-    this.objects = [];
     this.physicsManager = this.initializePhysicsManager();
     this.loadingManager = this.initializeLoadingManager();
     this.renderer = this.initializeRenderer();
@@ -221,38 +220,42 @@ class World {
       modelPath
     );
 
-    let mesh = model.scene;
-    mesh.position.y = 0;
+    let cryptMesh = model.scene;
+    cryptMesh.position.y = 0;
 
     const s = 0.4;
-    mesh.scale.set(s, s, s);
+    cryptMesh.scale.set(s, s, s);
 
-    model.scene.traverse((object) => {
-      if (object.isMesh) {
-        object.castShadow = true;
-        object.receiveShadow = true;
+    model.scene.traverse((node) => {
+      if (node.isMesh) {
+        node.castShadow = true;
+        node.receiveShadow = true;
+        // node.material.wireframe = true;
       }
     });
-    const glassMesh = mesh.getObjectByName("Mesh160Mesh").geometry;
-    const glassMass = 0;
-    const glassModel = new RigidBody();
-    glassModel.createObject(
-      glassMass,
-      glassMesh,
-      mesh.position,
-      mesh.quaternion
+
+    this.scene.add(cryptMesh);
+
+    // const glassMesh = cryptMesh.getObjectByName("Mesh160Mesh");
+    const tableMesh = cryptMesh.getObjectByName("Mesh116");
+    const tableMeshGeometry = tableMesh.geometry;
+    tableMesh.material.color.setHex(0x00ffff);
+
+    const rbTable = new RigidBody();
+    const tableMass = 20;
+    rbTable.createObject(
+      tableMass,
+      tableMeshGeometry,
+      tableMesh.position,
+      tableMesh.quaternion
     );
 
-    glassModel.setRestitution(0.2);
-    glassModel.setFriction(1);
-    glassModel.setRollingFriction(5);
+    rbTable.setRestitution(0.1);
+    rbTable.setFriction(0.5);
 
-    this.scene.add(mesh);
-    this.physicsManager.addRigidBody(mesh, glassModel, glassMass);
+    this.physicsManager.addRigidBody(tableMesh, rbTable, tableMass);
 
-    this.objects.push(mesh);
-
-    return mesh;
+    return cryptMesh;
   }
 
   initializeGround() {
@@ -283,11 +286,11 @@ class World {
 
   initializeBox() {
     const boxMesh = new Three.Mesh(
-      new Three.BoxGeometry(4, 4, 4),
-      new Three.MeshStandardMaterial({ color: 0x808080, wireframe: true })
+      new Three.BoxGeometry(3, 3, 3),
+      new Three.MeshStandardMaterial({ color: 0x808080 })
     );
 
-    boxMesh.position.set(4, 5, 0);
+    boxMesh.position.set(-10, 25, -80);
     boxMesh.rotateX(Math.PI / 3);
     boxMesh.castShadow = true;
     boxMesh.receiveShadow = true;
@@ -298,14 +301,39 @@ class World {
       boxMass,
       boxMesh.position,
       boxMesh.quaternion,
-      new Three.Vector3(4, 4, 4)
+      new Three.Vector3(3, 3, 3)
     );
 
-    rbBox.setRestitution(0.2);
-    rbBox.setFriction(1);
-    rbBox.setRollingFriction(5);
+    rbBox.setRestitution(0.1);
+    rbBox.setFriction(2);
 
     return [boxMesh, rbBox, boxMass];
+  }
+
+  initializeBoxy() {
+    const boxyMesh = new Three.Mesh(
+      new Three.BoxGeometry(0.3, 5, 5),
+      new Three.MeshStandardMaterial({ color: 0x808080 })
+    );
+
+    boxyMesh.position.set(-10, 0.5, -5);
+    boxyMesh.rotateX(Math.PI / 3);
+    boxyMesh.castShadow = true;
+    boxyMesh.receiveShadow = true;
+
+    const rbBoxy = new RigidBody();
+    const boxyMass = 10;
+    rbBoxy.createBox(
+      boxyMass,
+      boxyMesh.position,
+      boxyMesh.quaternion,
+      new Three.Vector3(0.3, 5, 5)
+    );
+
+    rbBoxy.setRestitution(0.1);
+    rbBoxy.setFriction(0.5);
+
+    return [boxyMesh, rbBoxy, boxyMass];
   }
 
   initializeScene() {
@@ -320,10 +348,11 @@ class World {
 
     const [boxMesh, rbBox, boxMass] = this.initializeBox();
     this.physicsManager.addRigidBody(boxMesh, rbBox, boxMass);
-    this.box = boxMesh;
     scene.add(boxMesh);
 
-    this.objects.push(boxMesh);
+    const [boxyMesh, rbBoxy, boxyMass] = this.initializeBoxy();
+    this.physicsManager.addRigidBody(boxyMesh, rbBoxy, boxyMass);
+    scene.add(boxyMesh);
 
     return scene;
   }
@@ -337,13 +366,13 @@ class World {
     const camera = new Three.PerspectiveCamera(fov, aspect, near, far);
     camera.position.x = -13;
     camera.position.y = 3;
-    camera.position.z = 10;
+    camera.position.z = -65;
 
     return camera;
   }
 
   initializeControls() {
-    return new FirstPersonController(this.camera, document, 15.0);
+    return new FirstPersonController(this.camera, document, 12.0);
   }
 
   createAmbientLight() {
@@ -351,7 +380,7 @@ class World {
   }
 
   createHemisphereLight() {
-    return new Three.HemisphereLight(0xffffbb, 0xf9ffbd, 1);
+    return new Three.HemisphereLight(0xffffbb, 0xf9ffbd, 0.5);
   }
 
   createDirectionalLight() {
@@ -473,7 +502,7 @@ class World {
 
   initializeLights() {
     this.scene.add(this.createAmbientLight());
-    // this.scene.add(this.createHemisphereLight());
+    this.scene.add(this.createHemisphereLight());
     // this.scene.add(this.createDirectionalLight());
     this.scene.add(this.createPointLight1());
     this.scene.add(this.createPointLight2());
@@ -492,7 +521,7 @@ class World {
     audioLoader.load("/assets/sounds/choir.ogg", function (buffer) {
       sound.setBuffer(buffer);
       sound.setLoop(true);
-      sound.setVolume(0.5);
+      sound.setVolume(0.25);
       // sound.play();
     });
   }
@@ -512,7 +541,7 @@ class World {
       const delta = this.clock.getDelta();
 
       this.physicsManager.update(delta);
-      this.controls.update(delta, this.objects);
+      this.controls.update(delta);
       this.renderer.render(this.scene, this.camera);
       this.animate();
     });

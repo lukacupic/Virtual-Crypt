@@ -10,18 +10,11 @@ export class FirstPersonController {
 
     this.velocity = new THREE.Vector3();
     this.direction = new THREE.Vector3();
-    this.raycaster = new THREE.Raycaster(
-      new THREE.Vector3(),
-      new THREE.Vector3(0, -1, 0),
-      0,
-      10
-    );
 
     this.moveForward = false;
     this.moveBackward = false;
     this.moveLeft = false;
     this.moveRight = false;
-    this.canJump = false;
   }
 
   initializeControls() {
@@ -98,29 +91,24 @@ export class FirstPersonController {
     return controls;
   }
 
-  update(delta, objects) {
+  update(delta) {
     if (this.controls.isLocked === false) return;
-
-    this.raycaster.setFromCamera(new THREE.Vector2(0.5, 0.5), this.camera);
-    this.raycaster.far = 1;
-    const intersects = this.raycaster.intersectObjects(objects);
-
-    for (let i = 0; i < intersects.length; i++) {
-      console.log("collision with object");
-      this.velocity.set(0, 0, 0);
-    }
 
     this.velocity.x -= this.velocity.x * 10.0 * delta;
     this.velocity.z -= this.velocity.z * 10.0 * delta;
 
     this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
     this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
+
     this.direction.normalize();
 
-    if (this.moveForward || this.moveBackward)
+    if (this.moveForward || this.moveBackward) {
       this.velocity.z -= this.direction.z * 10 * this.speed * delta;
-    if (this.moveLeft || this.moveRight)
+    }
+
+    if (this.moveLeft || this.moveRight) {
       this.velocity.x -= this.direction.x * 10 * this.speed * delta;
+    }
 
     this.controls.moveRight(-this.velocity.x * delta);
     this.controls.moveForward(-this.velocity.z * delta);

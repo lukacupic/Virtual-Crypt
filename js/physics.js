@@ -20,7 +20,7 @@ export class PhysicsManager {
     );
     this.tmpTransform = new Ammo.btTransform();
     this.rigidBodies = [];
-    this.physicsWorld.setGravity(new Ammo.btVector3(0, -25, 0));
+    this.physicsWorld.setGravity(new Ammo.btVector3(0, -15, 0));
   }
 
   addRigidBody(mesh, rigidBody, mass) {
