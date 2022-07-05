@@ -120,7 +120,6 @@ class RigidBody {
 
 class World {
   constructor() {
-    this.physicsManager = this.initializePhysicsManager();
     this.loadingManager = this.initializeLoadingManager();
     this.renderer = this.initializeRenderer();
     this.scene = this.initializeScene();
@@ -135,10 +134,6 @@ class World {
 
   async initialize() {
     const model = this.loadModel("/assets/models/crypt.glb");
-  }
-
-  initializePhysicsManager() {
-    return new PhysicsManager();
   }
 
   initializeLoadingManager() {
@@ -236,25 +231,6 @@ class World {
 
     this.scene.add(cryptMesh);
 
-    // const glassMesh = cryptMesh.getObjectByName("Mesh160Mesh");
-    const tableMesh = cryptMesh.getObjectByName("Mesh116");
-    const tableMeshGeometry = tableMesh.geometry;
-    tableMesh.material.color.setHex(0x00ffff);
-
-    const rbTable = new RigidBody();
-    const tableMass = 20;
-    rbTable.createObject(
-      tableMass,
-      tableMeshGeometry,
-      tableMesh.position,
-      tableMesh.quaternion
-    );
-
-    rbTable.setRestitution(0.1);
-    rbTable.setFriction(0.5);
-
-    this.physicsManager.addRigidBody(tableMesh, rbTable, tableMass);
-
     return cryptMesh;
   }
 
@@ -263,77 +239,10 @@ class World {
     floor.receiveShadow = true;
     floor.rotation.x = -Math.PI / 2;
 
-    // create ghost (invisible) floor mesh for the physics world
-    const ghostFloor = new Three.Mesh(
-      new Three.BoxGeometry(1000, 1, 1000),
-      new Three.MeshStandardMaterial({ color: 0x404040 })
-    );
-    ghostFloor.castShadow = false;
-    ghostFloor.receiveShadow = true;
+    floor.castShadow = false;
+    floor.receiveShadow = true;
 
-    const floorMass = 0;
-    const rbFloor = new RigidBody();
-    rbFloor.createBox(
-      floorMass,
-      ghostFloor.position,
-      ghostFloor.quaternion,
-      new Three.Vector3(1000, 0, 1000)
-    );
-    rbFloor.setRestitution(0.99);
-
-    return [floor, rbFloor, floorMass];
-  }
-
-  initializeBox() {
-    const boxMesh = new Three.Mesh(
-      new Three.BoxGeometry(3, 3, 3),
-      new Three.MeshStandardMaterial({ color: 0x808080 })
-    );
-
-    boxMesh.position.set(-10, 25, -80);
-    boxMesh.rotateX(Math.PI / 3);
-    boxMesh.castShadow = true;
-    boxMesh.receiveShadow = true;
-
-    const rbBox = new RigidBody();
-    const boxMass = 5;
-    rbBox.createBox(
-      boxMass,
-      boxMesh.position,
-      boxMesh.quaternion,
-      new Three.Vector3(3, 3, 3)
-    );
-
-    rbBox.setRestitution(0.1);
-    rbBox.setFriction(2);
-
-    return [boxMesh, rbBox, boxMass];
-  }
-
-  initializeBoxy() {
-    const boxyMesh = new Three.Mesh(
-      new Three.BoxGeometry(0.3, 5, 5),
-      new Three.MeshStandardMaterial({ color: 0x808080 })
-    );
-
-    boxyMesh.position.set(-10, 0.5, -5);
-    boxyMesh.rotateX(Math.PI / 3);
-    boxyMesh.castShadow = true;
-    boxyMesh.receiveShadow = true;
-
-    const rbBoxy = new RigidBody();
-    const boxyMass = 10;
-    rbBoxy.createBox(
-      boxyMass,
-      boxyMesh.position,
-      boxyMesh.quaternion,
-      new Three.Vector3(0.3, 5, 5)
-    );
-
-    rbBoxy.setRestitution(0.1);
-    rbBoxy.setFriction(0.5);
-
-    return [boxyMesh, rbBoxy, boxyMass];
+    return floor;
   }
 
   initializeScene() {
@@ -342,17 +251,8 @@ class World {
     scene.background = this.loadSkydome();
     scene.fog = new Three.Fog(scene.background, 1, 500);
 
-    const [floor, rbFloor, floorMass] = this.initializeGround();
-    this.physicsManager.addRigidBody(floor, rbFloor, floorMass);
+    const floor = this.initializeGround();
     scene.add(floor);
-
-    const [boxMesh, rbBox, boxMass] = this.initializeBox();
-    this.physicsManager.addRigidBody(boxMesh, rbBox, boxMass);
-    scene.add(boxMesh);
-
-    const [boxyMesh, rbBoxy, boxyMass] = this.initializeBoxy();
-    this.physicsManager.addRigidBody(boxyMesh, rbBoxy, boxyMass);
-    scene.add(boxyMesh);
 
     return scene;
   }
@@ -366,7 +266,7 @@ class World {
     const camera = new Three.PerspectiveCamera(fov, aspect, near, far);
     camera.position.x = -13;
     camera.position.y = 3;
-    camera.position.z = -65;
+    camera.position.z = -70;
 
     return camera;
   }
@@ -540,7 +440,6 @@ class World {
     requestAnimationFrame((t) => {
       const delta = this.clock.getDelta();
 
-      this.physicsManager.update(delta);
       this.controls.update(delta);
       this.renderer.render(this.scene, this.camera);
       this.animate();
@@ -548,12 +447,9 @@ class World {
   }
 }
 
-window.addEventListener("DOMContentLoaded", async () => {
-  Ammo().then(async (lib) => {
-    Ammo = lib;
-    let world = new World();
-    await world.initialize();
-
-    world.animate();
-  });
-});
+async function main() {
+  const world = new World();
+  await world.initialize();
+  world.animate();
+}
+main();
