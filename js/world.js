@@ -1,5 +1,7 @@
 import * as Three from "three";
 import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
+import Stats from "https://unpkg.com/three@0.141.0/examples/jsm/libs/stats.module";
+
 import { FirstPersonController } from "./controller.js";
 
 class World {
@@ -12,6 +14,10 @@ class World {
     this.lights = this.initializeLights();
     this.audioListener = this.initializeAudioListener();
     this.clock = this.initializeClock();
+
+    const stats = Stats();
+    document.body.appendChild(stats.dom);
+    this.stats = stats;
 
     this.onWindowResize();
   }
@@ -84,12 +90,12 @@ class World {
     floorTexture.encoding = Three.sRGBEncoding;
     floorTexture.wrapS = Three.RepeatWrapping;
     floorTexture.wrapT = Three.RepeatWrapping;
-    floorTexture.repeat.set(256, 256);
+    floorTexture.repeat.set(128, 128);
 
     const floorMaterial = new Three.MeshStandardMaterial({ map: floorTexture });
     floorMaterial.color.setHSL(0.095, 1, 0.75);
 
-    const floorGeometry = new Three.PlaneBufferGeometry(1000, 1000, 10, 10);
+    const floorGeometry = new Three.PlaneBufferGeometry(500, 500);
 
     return new Three.Mesh(floorGeometry, floorMaterial);
   }
@@ -110,6 +116,11 @@ class World {
         node.castShadow = true;
         node.receiveShadow = true;
         // node.material.wireframe = true;
+
+        if (node.material.map) {
+          node.material.map.anisotropy =
+            this.renderer.capabilities.getMaxAnisotropy();
+        }
       }
     });
 
@@ -134,7 +145,7 @@ class World {
     const scene = new Three.Scene();
 
     scene.background = this.loadSkydome();
-    scene.fog = new Three.Fog(scene.background, 1, 500);
+    scene.fog = new Three.Fog(scene.background, 1, 250);
 
     const floor = this.initializeGround();
     scene.add(floor);
@@ -146,9 +157,11 @@ class World {
     const fov = 60;
     const aspect = window.innerWidth / window.innerHeight;
     const near = 1.0;
-    const far = 1000.0;
+    const far = 750.0;
 
     const camera = new Three.PerspectiveCamera(fov, aspect, near, far);
+    camera.rotation.order = "YXZ";
+
     camera.position.x = -13;
     camera.position.y = 3;
     camera.position.z = -70;
@@ -157,7 +170,7 @@ class World {
   }
 
   initializeControls() {
-    return new FirstPersonController(this.camera, document, 12.0);
+    return new FirstPersonController(this.camera, document, 45);
   }
 
   createAmbientLight() {
@@ -287,7 +300,7 @@ class World {
 
   initializeLights() {
     this.scene.add(this.createAmbientLight());
-    this.scene.add(this.createHemisphereLight());
+    // this.scene.add(this.createHemisphereLight());
     // this.scene.add(this.createDirectionalLight());
     this.scene.add(this.createPointLight1());
     this.scene.add(this.createPointLight2());
@@ -301,13 +314,12 @@ class World {
     this.camera.add(listener);
 
     const sound = new Three.Audio(listener);
-
     const audioLoader = new Three.AudioLoader();
     audioLoader.load("/assets/sounds/choir.ogg", function (buffer) {
       sound.setBuffer(buffer);
       sound.setLoop(true);
       sound.setVolume(0.25);
-      // sound.play();
+      sound.play();
     });
   }
 
@@ -328,6 +340,8 @@ class World {
       this.controls.update(delta);
       this.renderer.render(this.scene, this.camera);
       this.animate();
+
+      this.stats.update();
     });
   }
 }

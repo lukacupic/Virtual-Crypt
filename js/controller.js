@@ -1,5 +1,4 @@
 import * as Three from "three";
-import { PointerLockControls } from "https://unpkg.com/three@0.141.0/examples/jsm/controls/PointerLockControls.js";
 import { Octree } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Octree.js";
 import { Capsule } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Capsule.js";
 
@@ -7,119 +6,152 @@ export class FirstPersonController {
   constructor(camera, document, speed) {
     this.camera = camera;
     this.document = document;
-    this.speed = speed;
-    this.controls = this.initializeControls();
 
     this.velocity = new Three.Vector3();
     this.direction = new Three.Vector3();
+    this.speed = speed;
 
     this.worldOctree = new Octree();
     this.playerCollider = new Capsule(
       new Three.Vector3(0, 0.35, 0),
-      new Three.Vector3(0, 1, 0),
-      0.35
+      new Three.Vector3(0, 3, 0),
+      1.75
     );
 
-    this.moveForward = false;
-    this.moveBackward = false;
-    this.moveLeft = false;
-    this.moveRight = false;
+    this.playerOnFloor = false;
+
+    this.keyStates = {};
+
+    this.blocker = this.document.getElementById("blocker");
+    this.instructions = this.document.getElementById("instructions");
+
+    this.document.addEventListener("keydown", (event) => {
+      this.keyStates[event.code] = true;
+    });
+
+    this.document.addEventListener("keyup", (event) => {
+      this.keyStates[event.code] = false;
+    });
+
+    this.document.addEventListener("mousedown", () => {
+      this.document.body.requestPointerLock();
+    });
+
+    this.document.body.addEventListener("mousemove", (event) => {
+      if (this.document.pointerLockElement === this.document.body) {
+        this.camera.rotation.y -= event.movementX / 750;
+        this.camera.rotation.x -= event.movementY / 750;
+      }
+    });
+
+    if ("onpointerlockchange" in this.document) {
+      this.document.addEventListener("pointerlockchange", (event) => {
+        console.log(this.document);
+        if (
+          !!this.document.pointerLockElement ||
+          !!this.document.mozPointerLockElement
+        ) {
+          this.instructions.style.display = "none";
+          this.blocker.style.display = "none";
+        } else {
+          this.blocker.style.display = "block";
+          this.instructions.style.display = "";
+        }
+      });
+    } else if ("onmozpointerlockchange" in this.document) {
+      this.document.addEventListener("mozpointerlockchange", (event) => {
+        console.log(this.document);
+        if (
+          !!this.document.pointerLockElement ||
+          !!this.document.mozPointerLockElement
+        ) {
+          this.instructions.style.display = "none";
+          this.blocker.style.display = "none";
+        } else {
+          this.blocker.style.display = "block";
+          this.instructions.style.display = "";
+        }
+      });
+    }
   }
 
-  initializeControls() {
-    const controls = new PointerLockControls(this.camera, this.document.body);
+  getForwardVector() {
+    this.camera.getWorldDirection(this.direction);
+    this.direction.y = 0;
+    this.direction.normalize();
 
-    const blocker = this.document.getElementById("blocker");
-    const instructions = this.document.getElementById("instructions");
+    return this.direction;
+  }
 
-    instructions.addEventListener("click", function () {
-      controls.lock();
-    });
+  getSideVector() {
+    this.camera.getWorldDirection(this.direction);
+    this.direction.y = 0;
+    this.direction.normalize();
+    this.direction.cross(this.camera.up);
 
-    controls.addEventListener("lock", function () {
-      instructions.style.display = "none";
-      blocker.style.display = "none";
-    });
+    return this.direction;
+  }
 
-    controls.addEventListener("unlock", function () {
-      blocker.style.display = "block";
-      instructions.style.display = "";
-    });
+  playerCollisions() {
+    const result = this.worldOctree.capsuleIntersect(this.playerCollider);
 
-    const onKeyDown = (event) => {
-      switch (event.code) {
-        case "ArrowUp":
-        case "KeyW":
-          this.moveForward = true;
-          break;
+    this.playerOnFloor = false;
 
-        case "ArrowLeft":
-        case "KeyA":
-          this.moveLeft = true;
-          break;
+    if (result) {
+      this.playerOnFloor = result.normal.y > 0;
 
-        case "ArrowDown":
-        case "KeyS":
-          this.moveBackward = true;
-          break;
-
-        case "ArrowRight":
-        case "KeyD":
-          this.moveRight = true;
-          break;
+      if (!this.playerOnFloor) {
+        this.velocity.addScaledVector(
+          result.normal,
+          -result.normal.dot(this.velocity)
+        );
       }
-    };
 
-    const onKeyUp = (event) => {
-      switch (event.code) {
-        case "ArrowUp":
-        case "KeyW":
-          this.moveForward = false;
-          break;
+      this.playerCollider.translate(result.normal.multiplyScalar(result.depth));
+    }
+  }
 
-        case "ArrowLeft":
-        case "KeyA":
-          this.moveLeft = false;
-          break;
+  updatePlayer(delta) {
+    let damping = Math.exp(-4 * delta) - 1;
 
-        case "ArrowDown":
-        case "KeyS":
-          this.moveBackward = false;
-          break;
+    if (!this.playerOnFloor) {
+      // this.velocity.y -= this.GRAVITY * delta;
+    } else {
+      damping *= 1.25;
+    }
 
-        case "ArrowRight":
-        case "KeyD":
-          this.moveRight = false;
-          break;
-      }
-    };
+    this.velocity.addScaledVector(this.velocity, damping);
 
-    this.document.addEventListener("keydown", onKeyDown);
-    this.document.addEventListener("keyup", onKeyUp);
+    const deltaPosition = this.velocity.clone().multiplyScalar(delta);
+    this.playerCollider.translate(deltaPosition);
 
-    return controls;
+    this.playerCollisions();
+
+    this.camera.position.copy(this.playerCollider.end);
+  }
+
+  controls(delta) {
+    const speedDelta = delta * this.speed;
+
+    if (this.keyStates["KeyW"]) {
+      this.velocity.add(this.getForwardVector().multiplyScalar(speedDelta));
+    }
+
+    if (this.keyStates["KeyS"]) {
+      this.velocity.add(this.getForwardVector().multiplyScalar(-speedDelta));
+    }
+
+    if (this.keyStates["KeyA"]) {
+      this.velocity.add(this.getSideVector().multiplyScalar(-speedDelta));
+    }
+
+    if (this.keyStates["KeyD"]) {
+      this.velocity.add(this.getSideVector().multiplyScalar(speedDelta));
+    }
   }
 
   update(delta) {
-    if (this.controls.isLocked === false) return;
-
-    this.velocity.x -= this.velocity.x * 10.0 * delta;
-    this.velocity.z -= this.velocity.z * 10.0 * delta;
-
-    this.direction.x = Number(this.moveRight) - Number(this.moveLeft);
-    this.direction.z = Number(this.moveForward) - Number(this.moveBackward);
-
-    this.direction.normalize();
-
-    if (this.moveLeft || this.moveRight) {
-      this.velocity.x -= this.direction.x * 10 * this.speed * delta;
-    }
-
-    if (this.moveForward || this.moveBackward) {
-      this.velocity.z -= this.direction.z * 10 * this.speed * delta;
-    }
-
-    this.controls.moveRight(-this.velocity.x * delta);
-    this.controls.moveForward(-this.velocity.z * delta);
+    this.controls(delta);
+    this.updatePlayer(delta);
   }
 }
