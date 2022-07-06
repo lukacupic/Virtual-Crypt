@@ -1,5 +1,7 @@
-import * as THREE from "three";
+import * as Three from "three";
 import { PointerLockControls } from "https://unpkg.com/three@0.141.0/examples/jsm/controls/PointerLockControls.js";
+import { Octree } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Octree.js";
+import { Capsule } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Capsule.js";
 
 export class FirstPersonController {
   constructor(camera, document, speed) {
@@ -8,8 +10,15 @@ export class FirstPersonController {
     this.speed = speed;
     this.controls = this.initializeControls();
 
-    this.velocity = new THREE.Vector3();
-    this.direction = new THREE.Vector3();
+    this.velocity = new Three.Vector3();
+    this.direction = new Three.Vector3();
+
+    this.worldOctree = new Octree();
+    this.playerCollider = new Capsule(
+      new Three.Vector3(0, 0.35, 0),
+      new Three.Vector3(0, 1, 0),
+      0.35
+    );
 
     this.moveForward = false;
     this.moveBackward = false;
@@ -90,32 +99,6 @@ export class FirstPersonController {
 
     return controls;
   }
-
-  // updatePlayer(delta) {
-  //   const deltaPosition = this.controls.velocity.clone().multiplyScalar(delta);
-  //   this.playerCollider.translate(deltaPosition);
-
-  //   playerCollisions();
-  // }
-
-  // playerCollisions() {
-  //   const result = this.worldOctree.capsuleIntersect(this.playerCollider);
-
-  //   playerOnFloor = false;
-
-  //   if (result) {
-  //     playerOnFloor = result.normal.y > 0;
-
-  //     if (!playerOnFloor) {
-  //       playerVelocity.addScaledVector(
-  //         result.normal,
-  //         -result.normal.dot(playerVelocity)
-  //       );
-  //     }
-
-  //     playerCollider.translate(result.normal.multiplyScalar(result.depth));
-  //   }
-  // }
 
   update(delta) {
     if (this.controls.isLocked === false) return;

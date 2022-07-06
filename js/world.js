@@ -1,7 +1,5 @@
 import * as Three from "three";
 import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
-import { Octree } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Octree.js";
-import { Capsule } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Capsule.js";
 import { FirstPersonController } from "./controller.js";
 
 class World {
@@ -14,13 +12,6 @@ class World {
     this.lights = this.initializeLights();
     this.audioListener = this.initializeAudioListener();
     this.clock = this.initializeClock();
-
-    this.worldOctree = new Octree();
-    this.playerCollider = new Capsule(
-      new Three.Vector3(0, 0.35, 0),
-      new Three.Vector3(0, 1, 0),
-      0.35
-    );
 
     this.onWindowResize();
   }
@@ -122,7 +113,7 @@ class World {
       }
     });
 
-    this.worldOctree.fromGraphNode(mesh);
+    this.controls.worldOctree.fromGraphNode(mesh);
     this.scene.add(mesh);
 
     return mesh;
