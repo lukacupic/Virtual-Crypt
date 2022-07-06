@@ -12,8 +12,8 @@ class World {
   constructor() {
     this.context = document;
 
-    this.loader = this.initializeLoader();
     this.renderer = this.initializeRenderer();
+    this.loader = this.initializeLoader();
     this.scene = this.initializeScene();
     this.camera = this.initializeCamera();
     this.controls = this.initializeControls();
@@ -31,10 +31,6 @@ class World {
   async initialize() {
     const glass = this.loader.loadGlass("/assets/models/crypt-glass.glb");
     const model = this.loader.loadModel("/assets/models/crypt.glb");
-  }
-
-  initializeLoader() {
-    return new Loader(this.context);
   }
 
   initializeRenderer() {
@@ -55,8 +51,15 @@ class World {
     return renderer;
   }
 
+  initializeLoader() {
+    return new Loader(this, this.renderer.capabilities.getMaxAnisotropy());
+  }
+
   initializeScene() {
     const scene = new Three.Scene();
+    scene.background = new Three.Color(0x000000);
+
+    console.log();
     scene.fog = new Three.Fog(scene.background, 1, 250);
 
     const floor = this.loader.loadFloor("/assets/textures/floor.jpg");
@@ -75,12 +78,12 @@ class World {
     const fov = 60;
     const aspect = window.innerWidth / window.innerHeight;
     const near = 1.0;
-    const far = 750.0;
+    const far = 300.0;
 
     const camera = new Three.PerspectiveCamera(fov, aspect, near, far);
     camera.rotation.order = "YXZ";
 
-    camera.position.x = -13;
+    camera.position.x = 0;
     camera.position.y = 3;
     camera.position.z = -70;
 

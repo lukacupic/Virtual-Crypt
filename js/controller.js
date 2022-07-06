@@ -12,10 +12,16 @@ export class FirstPersonController {
     this.speed = speed;
 
     this.worldOctree = new Octree();
+
+    this.playerX = -13;
+    this.playerY = 0;
+    this.playerZ = 0;
+    this.radius = 1.5;
+
     this.playerCollider = new Capsule(
-      new Three.Vector3(0, 0.35, 0),
-      new Three.Vector3(0, 3, 0),
-      1.75
+      new Three.Vector3(this.playerX, this.playerY + 0.35, this.playerZ),
+      new Three.Vector3(this.playerX, this.playerY + 3, this.playerZ),
+      this.radius
     );
 
     this.playerOnFloor = false;

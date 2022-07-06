@@ -1,8 +1,11 @@
 import * as Three from "three";
 
+import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
+
 export class Loader {
-  constructor(document) {
-    this.manager = this.initialize(document);
+  constructor(world) {
+    this.world = world;
+    this.manager = this.initialize(world.context);
   }
 
   initialize(document) {
@@ -27,10 +30,10 @@ export class Loader {
   }
 
   loadFloor(texturePath) {
-    const textureLoader = new Three.TextureLoader(this.getLoader());
+    const textureLoader = new Three.TextureLoader(this.manager);
     const floorTexture = textureLoader.load(texturePath);
 
-    const maxAnisotropy = this.renderer.capabilities.getMaxAnisotropy();
+    const maxAnisotropy = this.anisotropy;
     floorTexture.anisotropy = maxAnisotropy;
     floorTexture.encoding = Three.sRGBEncoding;
     floorTexture.wrapS = Three.RepeatWrapping;
@@ -46,7 +49,7 @@ export class Loader {
   }
 
   async loadGlass(glassPath) {
-    const model = await new GLTFLoader(this.getLoader()).loadAsync(glassPath);
+    const model = await new GLTFLoader(this.manager).loadAsync(glassPath);
 
     let mesh = model.scene;
     mesh.position.y = 0;
@@ -61,22 +64,19 @@ export class Loader {
         // node.material.wireframe = true;
 
         if (node.material.map) {
-          node.material.map.anisotropy =
-            this.renderer.capabilities.getMaxAnisotropy();
+          node.material.map.anisotropy = this.anisotropy;
         }
       }
     });
 
-    this.controls.worldOctree.fromGraphNode(mesh);
-    this.scene.add(mesh);
+    this.world.controls.worldOctree.fromGraphNode(mesh);
+    this.world.scene.add(mesh);
 
     return mesh;
   }
 
   async loadModel(modelPath) {
-    const model = await new GLTFLoader(this.loader.getLoader()).loadAsync(
-      modelPath
-    );
+    const model = await new GLTFLoader(this.manager).loadAsync(modelPath);
 
     let mesh = model.scene;
     mesh.position.y = 0;
@@ -90,18 +90,17 @@ export class Loader {
         node.receiveShadow = true;
 
         if (node.material.map) {
-          node.material.map.anisotropy =
-            this.renderer.capabilities.getMaxAnisotropy();
+          node.material.map.anisotropy = this.anisotropy;
         }
       }
     });
 
-    this.scene.add(mesh);
+    this.world.scene.add(mesh);
 
     return mesh;
   }
 
   getLoader() {
-    return this.manager;
+    return this.world.manager;
   }
 }
