@@ -24,13 +24,13 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new Three.AmbientLight(0xf5ffbd, 0.01);
+    return new Three.AmbientLight(0xf5ffbd, 0.005);
   }
 
   createPointLights(positions) {
     const pointLightColor = 0xffee96;
-    const pointLightIntensity = 80;
-    const pointLightDistance = 50;
+    const pointLightIntensity = 90;
+    const pointLightDistance = 40;
     const pointLightDecay = 2;
 
     const bulbGeometry = new Three.SphereGeometry(0.0, 16, 8);
