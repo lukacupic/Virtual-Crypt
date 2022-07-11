@@ -26,6 +26,10 @@ class World {
     this.clock = this.initializeClock();
 
     const stats = Stats();
+    const panels = [0, 1, 2]; // 0: fps, 1: ms, 2: mb
+    Array.from(stats.dom.children).forEach((child, index) => {
+      child.style.display = panels.includes(index) ? "inline-block" : "none";
+    });
     this.context.body.appendChild(stats.dom);
     this.stats = stats;
 
@@ -33,8 +37,8 @@ class World {
   }
 
   async initialize() {
-    const glass = this.loader.loadGlass("/assets/models/crypt-glass.glb");
-    const model = this.loader.loadModel("/assets/models/crypt-optimized.glb");
+    this.loader.loadPhysicalModel("/assets/models/crypt-glass-optimized.glb");
+    this.loader.loadVisualModel("/assets/models/crypt-optimized.glb");
   }
 
   initializeRenderer() {
@@ -63,7 +67,7 @@ class World {
     const scene = new Three.Scene();
     scene.background = new Three.Color(0x000000);
 
-    scene.fog = new Three.Fog(scene.background, 1, 250);
+    // scene.fog = new Three.Fog(scene.background, 1, 250);
 
     const floor = this.loader.loadFloor("/assets/textures/floor.jpg");
     floor.receiveShadow = true;

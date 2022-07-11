@@ -48,11 +48,19 @@ export class Loader {
     return new Three.Mesh(floorGeometry, floorMaterial);
   }
 
-  async loadGlass(glassPath) {
-    const model = await new GLTFLoader(this.manager).loadAsync(glassPath);
+  async loadPhysicalModel(modelPath, x = 0, y = 0, z = 0) {
+    const mesh = await this.loadVisualModel(modelPath, x, y, z);
+
+    this.world.controls.worldOctree.fromGraphNode(mesh);
+
+    return mesh;
+  }
+
+  async loadVisualModel(modelPath, x = 0, y = 0, z = 0) {
+    const model = await new GLTFLoader(this.manager).loadAsync(modelPath);
 
     let mesh = model.scene;
-    mesh.position.y = 0;
+    mesh.position.set(x, y, z);
 
     const s = 0.4;
     mesh.scale.set(s, s, s);
@@ -69,38 +77,8 @@ export class Loader {
       }
     });
 
-    this.world.controls.worldOctree.fromGraphNode(mesh);
     this.world.scene.add(mesh);
 
     return mesh;
-  }
-
-  async loadModel(modelPath) {
-    const model = await new GLTFLoader(this.manager).loadAsync(modelPath);
-
-    let mesh = model.scene;
-    mesh.position.y = 0;
-
-    const s = 0.4;
-    mesh.scale.set(s, s, s);
-
-    model.scene.traverse((node) => {
-      if (node.isMesh) {
-        node.castShadow = true;
-        node.receiveShadow = true;
-
-        if (node.material.map) {
-          node.material.map.anisotropy = this.anisotropy;
-        }
-      }
-    });
-
-    this.world.scene.add(mesh);
-
-    return mesh;
-  }
-
-  getLoader() {
-    return this.world.manager;
   }
 }
