@@ -34,7 +34,7 @@ class World {
 
   async initialize() {
     const glass = this.loader.loadGlass("/assets/models/crypt-glass.glb");
-    const model = this.loader.loadModel("/assets/models/crypt.glb");
+    const model = this.loader.loadModel("/assets/models/crypt-optimized.glb");
   }
 
   initializeRenderer() {
