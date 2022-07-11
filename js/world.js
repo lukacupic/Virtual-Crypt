@@ -92,6 +92,18 @@ class World {
 
     scene.add(carpet);
 
+    // carpet 2
+
+    const carpet2 = this.loader.loadCarpet2("/assets/textures/carpet.jpg");
+    carpet2.receiveShadow = true;
+    carpet2.rotation.x = -Math.PI / 2;
+    carpet2.position.set(0, 0.05, -80.75);
+
+    carpet2.castShadow = false;
+    carpet2.receiveShadow = true;
+
+    scene.add(carpet2);
+
     return scene;
   }
 
@@ -112,9 +124,8 @@ class World {
   }
 
   initializeComposer() {
-    const composer = new EffectComposer(this.renderer);
-    composer.addPass(new RenderPass(this.scene, this.camera));
-
+    // const composer = new EffectComposer(this.renderer);
+    // composer.addPass(new RenderPass(this.scene, this.camera));
     // const ssaoPass = new SSAOPass(
     //   this.scene,
     //   this.camera,
@@ -122,11 +133,9 @@ class World {
     //   window.innerHeight
     // );
     // this.ssaoPass = ssaoPass;
-
     // ssaoPass.kernelRadius = 4;
     // composer.addPass(ssaoPass);
-
-    return composer;
+    // return composer;
   }
 
   initializeControls() {
@@ -173,7 +182,7 @@ class World {
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.composer.setSize(window.innerWidth, window.innerHeight);
+    // this.composer.setSize(window.innerWidth, window.innerHeight);
   }
 
   animate() {
@@ -181,7 +190,8 @@ class World {
       const delta = this.clock.getDelta();
 
       this.controls.update(delta);
-      this.composer.render();
+      // this.composer.render();
+      this.renderer.render(this.scene, this.camera);
       this.animate();
 
       this.stats.update();

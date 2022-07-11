@@ -56,14 +56,42 @@ export class Loader {
     carpetTexture.encoding = Three.sRGBEncoding;
     carpetTexture.wrapS = Three.RepeatWrapping;
     carpetTexture.wrapT = Three.RepeatWrapping;
-    carpetTexture.repeat.set(4, 64);
+    carpetTexture.repeat.set(4, 128);
 
     const carpetMaterial = new Three.MeshStandardMaterial({
       map: carpetTexture,
     });
     carpetMaterial.color.setHSL(0.095, 1, 0.75);
 
-    const carpetGeometry = new Three.PlaneBufferGeometry(5, 150);
+    const carpetGeometry = new Three.PlaneBufferGeometry(5, 300);
+
+    return new Three.Mesh(carpetGeometry, carpetMaterial);
+  }
+
+  async loadPhysicalModel(modelPath, x = 0, y = 0, z = 0) {
+    const mesh = await this.loadVisualModel(modelPath, x, y, z);
+
+    this.world.controls.worldOctree.fromGraphNode(mesh);
+
+    return mesh;
+  }
+
+  loadCarpet2(path) {
+    const textureLoader = new Three.TextureLoader(this.manager);
+    const carpetTexture = textureLoader.load(path);
+
+    carpetTexture.anisotropy = this.anisotropy;
+    carpetTexture.encoding = Three.sRGBEncoding;
+    carpetTexture.wrapS = Three.RepeatWrapping;
+    carpetTexture.wrapT = Three.RepeatWrapping;
+    carpetTexture.repeat.set(128, 4);
+
+    const carpetMaterial = new Three.MeshStandardMaterial({
+      map: carpetTexture,
+    });
+    carpetMaterial.color.setHSL(0.095, 1, 0.75);
+
+    const carpetGeometry = new Three.PlaneBufferGeometry(300, 5);
 
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
