@@ -41,9 +41,6 @@ export class FirstPersonController {
 
     this.document.addEventListener("mousedown", () => {
       this.document.body.requestPointerLock();
-
-      // this.instructions.style.display = "none";
-      // this.blocker.style.display = "none";
     });
 
     this.document.body.addEventListener("mousemove", (event) => {
