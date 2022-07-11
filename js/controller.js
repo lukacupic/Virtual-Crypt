@@ -52,7 +52,6 @@ export class FirstPersonController {
 
     if ("onpointerlockchange" in this.document) {
       this.document.addEventListener("pointerlockchange", (event) => {
-        console.log(this.document);
         if (
           !!this.document.pointerLockElement ||
           !!this.document.mozPointerLockElement
@@ -66,7 +65,6 @@ export class FirstPersonController {
       });
     } else if ("onmozpointerlockchange" in this.document) {
       this.document.addEventListener("mozpointerlockchange", (event) => {
-        console.log(this.document);
         if (
           !!this.document.pointerLockElement ||
           !!this.document.mozPointerLockElement

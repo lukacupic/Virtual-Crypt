@@ -8,6 +8,10 @@ import { LightManager } from "./lights.js";
 import { AudioManager } from "./audio.js";
 import { Loader } from "./loader.js";
 
+import { EffectComposer } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/EffectComposer.js";
+import { RenderPass } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/RenderPass.js";
+import { UnrealBloomPass } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/UnrealBloomPass.js";
+
 class World {
   constructor() {
     this.context = document;
@@ -16,9 +20,10 @@ class World {
     this.loader = this.initializeLoader();
     this.scene = this.initializeScene();
     this.camera = this.initializeCamera();
+    this.composer = this.initializeComposer();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
-    this.audio = this.initializeAudio();
+    // this.audio = this.initializeAudio();
     this.clock = this.initializeClock();
 
     const stats = Stats();
@@ -36,7 +41,7 @@ class World {
   initializeRenderer() {
     const renderer = new Three.WebGLRenderer({ antialias: true });
 
-    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setPixelRatio(window.devicePixelRatio * 1.0);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     renderer.physicallyCorrectLights = true;
@@ -59,7 +64,6 @@ class World {
     const scene = new Three.Scene();
     scene.background = new Three.Color(0x000000);
 
-    console.log();
     scene.fog = new Three.Fog(scene.background, 1, 250);
 
     const floor = this.loader.loadFloor("/assets/textures/floor.jpg");
@@ -90,6 +94,26 @@ class World {
     return camera;
   }
 
+  initializeComposer() {
+    const renderScene = new RenderPass(this.scene, this.camera);
+
+    const bloomPass = new UnrealBloomPass(
+      new Three.Vector2(window.innerWidth, window.innerHeight),
+      1.5,
+      0.4,
+      0.85
+    );
+    bloomPass.threshold = 0;
+    bloomPass.strength = 1.5;
+    bloomPass.radius = 0;
+
+    const composer = new EffectComposer(this.renderer);
+    composer.addPass(renderScene);
+    composer.addPass(bloomPass);
+
+    return composer;
+  }
+
   initializeControls() {
     return new FirstPersonController(this.camera, this.context, 45);
   }
@@ -100,7 +124,7 @@ class World {
 
   initializeAudio() {
     const audioManager = new AudioManager(this.camera);
-    // audioManager.play();
+    audioManager.play();
 
     return audioManager;
   }
@@ -113,6 +137,7 @@ class World {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(window.innerWidth, window.innerHeight);
+    // this.composer.setSize(window.innerWidth, window.innerHeight);
   }
 
   animate() {
@@ -121,6 +146,7 @@ class World {
 
       this.controls.update(delta);
       this.renderer.render(this.scene, this.camera);
+      // this.composer.render();
       this.animate();
 
       this.stats.update();
