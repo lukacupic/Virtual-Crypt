@@ -1,6 +1,5 @@
 import * as Three from "three";
 
-import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
 import Stats from "https://unpkg.com/three@0.141.0/examples/jsm/libs/stats.module";
 
 import { FirstPersonController } from "./controller.js";
@@ -41,7 +40,7 @@ class World {
   initializeRenderer() {
     const renderer = new Three.WebGLRenderer({ antialias: true });
 
-    renderer.setPixelRatio(window.devicePixelRatio * 1.0);
+    renderer.setPixelRatio(window.devicePixelRatio * 0.9);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     renderer.physicallyCorrectLights = true;
