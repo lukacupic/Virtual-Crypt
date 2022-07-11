@@ -39,8 +39,22 @@ class World {
   }
 
   async initialize() {
-    this.loader.loadPhysicalModel("/assets/models/crypt-glass-optimized.glb");
-    this.loader.loadVisualModel("/assets/models/crypt-optimized.glb");
+    this.loader.loadPhysicalModel(
+      "/assets/models/crypt-glass-optimized.glb",
+      0,
+      0,
+      0,
+      0.4
+    );
+    this.loader.loadVisualModel(
+      "/assets/models/crypt-optimized.glb",
+      0,
+      0,
+      0,
+      0.4
+    );
+
+    this.loader.loadPhysicalModel("/assets/models/vase.glb", 7, -1.85, -30, 8);
   }
 
   initializeRenderer() {
@@ -71,7 +85,7 @@ class World {
 
     scene.fog = new Three.Fog(scene.background, 1, 200);
 
-    const floor = this.loader.loadFloor("/assets/textures/floor.jpg");
+    const floor = this.loader.loadFloor("/assets/textures/marble.jpg");
     floor.receiveShadow = true;
     floor.position.set(0, -1.85, 0);
     floor.rotation.x = -Math.PI / 2;

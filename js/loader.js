@@ -68,14 +68,6 @@ export class Loader {
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
 
-  async loadPhysicalModel(modelPath, x = 0, y = 0, z = 0) {
-    const mesh = await this.loadVisualModel(modelPath, x, y, z);
-
-    this.world.controls.worldOctree.fromGraphNode(mesh);
-
-    return mesh;
-  }
-
   loadCarpet2(path) {
     const carpetTexture = this.loadTexture(path, 128, 4);
 
@@ -89,22 +81,21 @@ export class Loader {
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
 
-  async loadPhysicalModel(modelPath, x = 0, y = 0, z = 0) {
-    const mesh = await this.loadVisualModel(modelPath, x, y, z);
+  async loadPhysicalModel(modelPath, x = 0, y = 0, z = 0, scale = 1) {
+    const mesh = await this.loadVisualModel(modelPath, x, y, z, scale);
 
     this.world.controls.worldOctree.fromGraphNode(mesh);
 
     return mesh;
   }
 
-  async loadVisualModel(modelPath, x = 0, y = 0, z = 0) {
+  async loadVisualModel(modelPath, x = 0, y = 0, z = 0, scale = 1) {
     const model = await new GLTFLoader(this.manager).loadAsync(modelPath);
 
     let mesh = model.scene;
     mesh.position.set(x, y, z);
 
-    const s = 0.4;
-    mesh.scale.set(s, s, s);
+    mesh.scale.set(scale, scale, scale);
 
     model.scene.traverse((node) => {
       if (node.isMesh) {

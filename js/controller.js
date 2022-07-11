@@ -19,7 +19,7 @@ export class FirstPersonController {
     this.radius = 1;
 
     this.playerCollider = new Capsule(
-      new Three.Vector3(this.playerX, this.playerY + 0.35, this.playerZ),
+      new Three.Vector3(this.playerX, this.playerY + 0.1, this.playerZ),
       new Three.Vector3(this.playerX, this.playerY + 2.85, this.playerZ),
       this.radius
     );
