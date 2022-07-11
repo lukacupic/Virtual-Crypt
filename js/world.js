@@ -73,6 +73,7 @@ class World {
 
     const floor = this.loader.loadFloor("/assets/textures/floor.jpg");
     floor.receiveShadow = true;
+    floor.position.set(0, -1.85, 0);
     floor.rotation.x = -Math.PI / 2;
 
     floor.castShadow = false;
@@ -85,7 +86,7 @@ class World {
     const carpet = this.loader.loadCarpet("/assets/textures/carpet.jpg");
     carpet.receiveShadow = true;
     carpet.rotation.x = -Math.PI / 2;
-    carpet.position.set(-13, 0.05, 0);
+    carpet.position.set(-13, -1.8, 0);
 
     carpet.castShadow = false;
     carpet.receiveShadow = true;
@@ -97,7 +98,7 @@ class World {
     const carpet2 = this.loader.loadCarpet2("/assets/textures/carpet.jpg");
     carpet2.receiveShadow = true;
     carpet2.rotation.x = -Math.PI / 2;
-    carpet2.position.set(0, 0.05, -80.75);
+    carpet2.position.set(0, -1.8, -80.75);
 
     carpet2.castShadow = false;
     carpet2.receiveShadow = true;
@@ -124,18 +125,18 @@ class World {
   }
 
   initializeComposer() {
-    // const composer = new EffectComposer(this.renderer);
-    // composer.addPass(new RenderPass(this.scene, this.camera));
-    // const ssaoPass = new SSAOPass(
-    //   this.scene,
-    //   this.camera,
-    //   window.innerWidth,
-    //   window.innerHeight
-    // );
-    // this.ssaoPass = ssaoPass;
-    // ssaoPass.kernelRadius = 4;
+    const composer = new EffectComposer(this.renderer);
+    composer.addPass(new RenderPass(this.scene, this.camera));
+    const ssaoPass = new SSAOPass(
+      this.scene,
+      this.camera,
+      window.innerWidth,
+      window.innerHeight
+    );
+    this.ssaoPass = ssaoPass;
+    ssaoPass.kernelRadius = 4;
     // composer.addPass(ssaoPass);
-    // return composer;
+    return composer;
   }
 
   initializeControls() {
@@ -182,7 +183,7 @@ class World {
     this.camera.updateProjectionMatrix();
 
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    // this.composer.setSize(window.innerWidth, window.innerHeight);
+    this.composer.setSize(window.innerWidth, window.innerHeight);
   }
 
   animate() {
@@ -190,8 +191,8 @@ class World {
       const delta = this.clock.getDelta();
 
       this.controls.update(delta);
-      // this.composer.render();
-      this.renderer.render(this.scene, this.camera);
+      this.composer.render();
+      // this.renderer.render(this.scene, this.camera);
       this.animate();
 
       this.stats.update();

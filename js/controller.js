@@ -16,11 +16,11 @@ export class FirstPersonController {
     this.playerX = -13;
     this.playerY = 0;
     this.playerZ = 0;
-    this.radius = 1.5;
+    this.radius = 1;
 
     this.playerCollider = new Capsule(
       new Three.Vector3(this.playerX, this.playerY + 0.35, this.playerZ),
-      new Three.Vector3(this.playerX, this.playerY + 3, this.playerZ),
+      new Three.Vector3(this.playerX, this.playerY + 2.85, this.playerZ),
       this.radius
     );
 
