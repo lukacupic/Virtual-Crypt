@@ -1,11 +1,14 @@
 import * as Three from "three";
 
 import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
+import { TextureLoader } from "three";
 
 export class Loader {
   constructor(world, anisotropy) {
     this.world = world;
     this.manager = this.initialize(world.context);
+    this.textureLoader = new TextureLoader(this.manager);
+    this.anisotropy = anisotropy;
   }
 
   initialize(document) {
@@ -29,16 +32,20 @@ export class Loader {
     return manager;
   }
 
-  loadFloor(path) {
-    const textureLoader = new Three.TextureLoader(this.manager);
-    const floorTexture = textureLoader.load(path);
+  loadTexture(path, repeatX, repeatY) {
+    const texture = this.textureLoader.load(path);
 
-    const maxAnisotropy = this.anisotropy;
-    floorTexture.anisotropy = maxAnisotropy;
-    floorTexture.encoding = Three.sRGBEncoding;
-    floorTexture.wrapS = Three.RepeatWrapping;
-    floorTexture.wrapT = Three.RepeatWrapping;
-    floorTexture.repeat.set(128, 128);
+    texture.anisotropy = this.anisotropy;
+    texture.encoding = Three.sRGBEncoding;
+    texture.wrapS = Three.RepeatWrapping;
+    texture.wrapT = Three.RepeatWrapping;
+    texture.repeat.set(repeatX, repeatY);
+
+    return texture;
+  }
+
+  loadFloor(path) {
+    const floorTexture = this.loadTexture(path, 128, 128);
 
     const floorMaterial = new Three.MeshStandardMaterial({ map: floorTexture });
     floorMaterial.color.setHSL(0.095, 1, 0.75);
@@ -49,14 +56,7 @@ export class Loader {
   }
 
   loadCarpet(path) {
-    const textureLoader = new Three.TextureLoader(this.manager);
-    const carpetTexture = textureLoader.load(path);
-
-    carpetTexture.anisotropy = this.anisotropy;
-    carpetTexture.encoding = Three.sRGBEncoding;
-    carpetTexture.wrapS = Three.RepeatWrapping;
-    carpetTexture.wrapT = Three.RepeatWrapping;
-    carpetTexture.repeat.set(4, 128);
+    const carpetTexture = this.loadTexture(path, 4, 128);
 
     const carpetMaterial = new Three.MeshStandardMaterial({
       map: carpetTexture,
@@ -77,14 +77,7 @@ export class Loader {
   }
 
   loadCarpet2(path) {
-    const textureLoader = new Three.TextureLoader(this.manager);
-    const carpetTexture = textureLoader.load(path);
-
-    carpetTexture.anisotropy = this.anisotropy;
-    carpetTexture.encoding = Three.sRGBEncoding;
-    carpetTexture.wrapS = Three.RepeatWrapping;
-    carpetTexture.wrapT = Three.RepeatWrapping;
-    carpetTexture.repeat.set(128, 4);
+    const carpetTexture = this.loadTexture(path, 128, 4);
 
     const carpetMaterial = new Three.MeshStandardMaterial({
       map: carpetTexture,
