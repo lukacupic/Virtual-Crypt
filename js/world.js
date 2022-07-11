@@ -1,6 +1,7 @@
 import * as Three from "three";
 
 import Stats from "https://unpkg.com/three@0.141.0/examples/jsm/libs/stats.module";
+import { GUI } from "https://unpkg.com/three@0.141.0/examples/jsm/libs/lil-gui.module.min.js";
 
 import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
@@ -9,7 +10,7 @@ import { Loader } from "./loader.js";
 
 import { EffectComposer } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/RenderPass.js";
-import { UnrealBloomPass } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/UnrealBloomPass.js";
+import { SSAOPass } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/SSAOPass.js";
 
 class World {
   constructor() {
@@ -23,6 +24,7 @@ class World {
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
     // this.audio = this.initializeAudio();
+    this.gui = this.initializeGUI();
     this.clock = this.initializeClock();
 
     const stats = Stats();
@@ -78,6 +80,18 @@ class World {
 
     scene.add(floor);
 
+    // carpet
+
+    const carpet = this.loader.loadCarpet("/assets/textures/carpet.jpg");
+    carpet.receiveShadow = true;
+    carpet.rotation.x = -Math.PI / 2;
+    carpet.position.set(-13, 0.05, 0);
+
+    carpet.castShadow = false;
+    carpet.receiveShadow = true;
+
+    scene.add(carpet);
+
     return scene;
   }
 
@@ -98,21 +112,19 @@ class World {
   }
 
   initializeComposer() {
-    const renderScene = new RenderPass(this.scene, this.camera);
-
-    const bloomPass = new UnrealBloomPass(
-      new Three.Vector2(window.innerWidth, window.innerHeight),
-      1.5,
-      0.4,
-      0.85
-    );
-    bloomPass.threshold = 0;
-    bloomPass.strength = 1.5;
-    bloomPass.radius = 0;
-
     const composer = new EffectComposer(this.renderer);
-    composer.addPass(renderScene);
-    composer.addPass(bloomPass);
+    composer.addPass(new RenderPass(this.scene, this.camera));
+
+    // const ssaoPass = new SSAOPass(
+    //   this.scene,
+    //   this.camera,
+    //   window.innerWidth,
+    //   window.innerHeight
+    // );
+    // this.ssaoPass = ssaoPass;
+
+    // ssaoPass.kernelRadius = 4;
+    // composer.addPass(ssaoPass);
 
     return composer;
   }
@@ -132,6 +144,26 @@ class World {
     return audioManager;
   }
 
+  initializeGUI() {
+    // const gui = new GUI();
+    // gui
+    //   .add(this.ssaoPass, "output", {
+    //     Default: SSAOPass.OUTPUT.Default,
+    //     "SSAO Only": SSAOPass.OUTPUT.SSAO,
+    //     "SSAO Only + Blur": SSAOPass.OUTPUT.Blur,
+    //     Beauty: SSAOPass.OUTPUT.Beauty,
+    //     Depth: SSAOPass.OUTPUT.Depth,
+    //     Normal: SSAOPass.OUTPUT.Normal,
+    //   })
+    //   .onChange((value) => {
+    //     this.ssaoPass.output = parseInt(value);
+    //   });
+    // gui.add(this.ssaoPass, "kernelRadius").min(0).max(32);
+    // gui.add(this.ssaoPass, "minDistance").min(0.001).max(0.02);
+    // gui.add(this.ssaoPass, "maxDistance").min(0.01).max(0.3);
+    // return gui;
+  }
+
   initializeClock() {
     return new Three.Clock();
   }
@@ -139,8 +171,9 @@ class World {
   onWindowResize() {
     this.camera.aspect = window.innerWidth / window.innerHeight;
     this.camera.updateProjectionMatrix();
+
     this.renderer.setSize(window.innerWidth, window.innerHeight);
-    // this.composer.setSize(window.innerWidth, window.innerHeight);
+    this.composer.setSize(window.innerWidth, window.innerHeight);
   }
 
   animate() {
@@ -148,8 +181,7 @@ class World {
       const delta = this.clock.getDelta();
 
       this.controls.update(delta);
-      this.renderer.render(this.scene, this.camera);
-      // this.composer.render();
+      this.composer.render();
       this.animate();
 
       this.stats.update();

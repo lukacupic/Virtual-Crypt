@@ -3,7 +3,7 @@ import * as Three from "three";
 import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
 
 export class Loader {
-  constructor(world) {
+  constructor(world, anisotropy) {
     this.world = world;
     this.manager = this.initialize(world.context);
   }
@@ -29,9 +29,9 @@ export class Loader {
     return manager;
   }
 
-  loadFloor(texturePath) {
+  loadFloor(path) {
     const textureLoader = new Three.TextureLoader(this.manager);
-    const floorTexture = textureLoader.load(texturePath);
+    const floorTexture = textureLoader.load(path);
 
     const maxAnisotropy = this.anisotropy;
     floorTexture.anisotropy = maxAnisotropy;
@@ -46,6 +46,26 @@ export class Loader {
     const floorGeometry = new Three.PlaneBufferGeometry(500, 500);
 
     return new Three.Mesh(floorGeometry, floorMaterial);
+  }
+
+  loadCarpet(path) {
+    const textureLoader = new Three.TextureLoader(this.manager);
+    const carpetTexture = textureLoader.load(path);
+
+    carpetTexture.anisotropy = this.anisotropy;
+    carpetTexture.encoding = Three.sRGBEncoding;
+    carpetTexture.wrapS = Three.RepeatWrapping;
+    carpetTexture.wrapT = Three.RepeatWrapping;
+    carpetTexture.repeat.set(4, 64);
+
+    const carpetMaterial = new Three.MeshStandardMaterial({
+      map: carpetTexture,
+    });
+    carpetMaterial.color.setHSL(0.095, 1, 0.75);
+
+    const carpetGeometry = new Three.PlaneBufferGeometry(5, 150);
+
+    return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
 
   async loadPhysicalModel(modelPath, x = 0, y = 0, z = 0) {
