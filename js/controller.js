@@ -24,8 +24,6 @@ export class FirstPersonController {
       this.radius
     );
 
-    this.playerOnFloor = false;
-
     this.keyStates = {};
 
     this.blocker = this.document.getElementById("blocker");
@@ -96,34 +94,8 @@ export class FirstPersonController {
     return this.direction;
   }
 
-  playerCollisions() {
-    const result = this.worldOctree.capsuleIntersect(this.playerCollider);
-
-    this.playerOnFloor = false;
-
-    if (result) {
-      this.playerOnFloor = result.normal.y > 0;
-
-      if (!this.playerOnFloor) {
-        this.velocity.addScaledVector(
-          result.normal,
-          -result.normal.dot(this.velocity)
-        );
-      }
-
-      this.playerCollider.translate(result.normal.multiplyScalar(result.depth));
-    }
-  }
-
   updatePlayer(delta) {
-    let damping = Math.exp(-4 * delta) - 1;
-
-    if (!this.playerOnFloor) {
-      // this.velocity.y -= this.GRAVITY * delta;
-    } else {
-      damping *= 1.25;
-    }
-
+    let damping = 1.25 * (Math.exp(-4 * delta) - 1);
     this.velocity.addScaledVector(this.velocity, damping);
 
     const deltaPosition = this.velocity.clone().multiplyScalar(delta);
@@ -134,7 +106,19 @@ export class FirstPersonController {
     this.camera.position.copy(this.playerCollider.end);
   }
 
-  controls(delta) {
+  playerCollisions() {
+    const collision = this.worldOctree.capsuleIntersect(this.playerCollider);
+
+    if (collision) {
+      const collisionVector = collision.normal.multiplyScalar(collision.depth);
+      collisionVector.setY(0); // don't allow player to move up or down
+
+      this.playerCollider.start.add(collisionVector);
+      this.playerCollider.end.add(collisionVector);
+    }
+  }
+
+  updateControls(delta) {
     const speedDelta = delta * this.speed;
 
     if (this.keyStates["KeyW"]) {
@@ -155,7 +139,7 @@ export class FirstPersonController {
   }
 
   update(delta) {
-    this.controls(delta);
+    this.updateControls(delta);
     this.updatePlayer(delta);
   }
 }

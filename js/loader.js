@@ -63,7 +63,7 @@ export class Loader {
     });
     carpetMaterial.color.setHSL(0.095, 1, 0.75);
 
-    const carpetGeometry = new Three.PlaneBufferGeometry(5, 300);
+    const carpetGeometry = new Three.PlaneBufferGeometry(10, 300);
 
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
@@ -76,7 +76,7 @@ export class Loader {
     });
     carpetMaterial.color.setHSL(0.095, 1, 0.75);
 
-    const carpetGeometry = new Three.PlaneBufferGeometry(300, 5);
+    const carpetGeometry = new Three.PlaneBufferGeometry(300, 7);
 
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
