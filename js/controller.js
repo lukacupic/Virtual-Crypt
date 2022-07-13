@@ -119,7 +119,7 @@ export class FirstPersonController {
   }
 
   updateControls(delta) {
-    const speedDelta = delta * this.speed;
+    const speedDelta = delta * this.speed * 4.0;
 
     if (this.keyStates["KeyW"]) {
       this.velocity.add(this.getForwardVector().multiplyScalar(speedDelta));
