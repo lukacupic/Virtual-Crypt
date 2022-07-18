@@ -39,22 +39,16 @@ class World {
   }
 
   async initialize() {
-    this.loader.loadPhysicalModel(
-      "/assets/models/crypt-glass-optimized.glb",
-      0,
-      0,
-      0,
-      0.4
-    );
-    this.loader.loadVisualModel(
-      "/assets/models/crypt-optimized.glb",
-      0,
-      0,
-      0,
-      0.4
-    );
+    this.loader.loadPhysicalModel("/assets/models/crypt-glass.glb", [], [], 0);
 
-    this.loader.loadPhysicalModel("/assets/models/vase.glb", 7, -1.85, -30, 8);
+    this.loader.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
+
+    this.loader.loadVisualModel(
+      "/assets/models/body3.glb",
+      [23, 0, -81],
+      [0, -Math.PI / 2, 0],
+      1.2
+    );
   }
 
   initializeRenderer() {
@@ -146,7 +140,7 @@ class World {
   }
 
   initializeControls() {
-    return new FirstPersonController(this.camera, this.context, 12.5);
+    return new FirstPersonController(this.camera, this.context, 15);
   }
 
   initializeLights() {
