@@ -100,14 +100,13 @@ export class Loader {
     let mesh = model.scene;
     mesh.position.set(position[0] || 0, position[1] || 0, position[2] || 0);
 
-    console.log(rotation);
     mesh.rotateX(rotation[0] || 0);
     mesh.rotateY(rotation[1] || 0);
     mesh.rotateZ(rotation[2] || 0);
 
     mesh.scale.set(scale || 1, scale || 1, scale || 1);
 
-    model.scene.traverse((node) => {
+    mesh.traverse((node) => {
       if (node.isMesh) {
         node.castShadow = true;
         node.receiveShadow = true;

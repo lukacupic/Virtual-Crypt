@@ -1,7 +1,6 @@
 import * as Three from "three";
 
 import Stats from "https://unpkg.com/three@0.141.0/examples/jsm/libs/stats.module";
-import { GUI } from "https://unpkg.com/three@0.141.0/examples/jsm/libs/lil-gui.module.min.js";
 
 import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
@@ -39,15 +38,16 @@ class World {
   }
 
   async initialize() {
-    this.loader.loadPhysicalModel("/assets/models/crypt-glass.glb", [], [], 0);
-
-    this.loader.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
-
+    // this.loader.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
+    // this.loader.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
     this.loader.loadVisualModel(
-      "/assets/models/body3.glb",
-      [23, 0, -81],
-      [0, -Math.PI / 2, 0],
-      1.2
+      "/assets/models/body4.glb",
+      // [23, -2, -81],
+      // [0, -2, 0],
+      // [0, -Math.PI / 2, 0],
+      [0, 0, 5],
+      [0, 0, 0],
+      1.6
     );
   }
 
@@ -80,11 +80,9 @@ class World {
     scene.fog = new Three.Fog(scene.background, 1, 200);
 
     const floor = this.loader.loadFloor("/assets/textures/marble.jpg");
-    floor.receiveShadow = true;
     floor.position.set(0, -1.85, 0);
     floor.rotation.x = -Math.PI / 2;
 
-    floor.castShadow = false;
     floor.receiveShadow = true;
 
     scene.add(floor);
@@ -96,7 +94,6 @@ class World {
     carpet.rotation.x = -Math.PI / 2;
     carpet.position.set(-13, -1.8, 0);
 
-    carpet.castShadow = false;
     carpet.receiveShadow = true;
 
     scene.add(carpet);
@@ -108,7 +105,6 @@ class World {
     carpet2.rotation.x = -Math.PI / 2;
     carpet2.position.set(0, -1.8, -80.75);
 
-    carpet2.castShadow = false;
     carpet2.receiveShadow = true;
 
     scene.add(carpet2);
