@@ -21,7 +21,7 @@ class World {
     this.composer = this.initializeComposer();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
-    // this.audio = this.initializeAudio();
+    this.audio = this.initializeAudio();
     this.clock = this.initializeClock();
 
     const stats = Stats();
@@ -38,17 +38,52 @@ class World {
   }
 
   async initialize() {
-    // this.loader.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
-    // this.loader.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
-    this.loader.loadVisualModel(
-      "/assets/models/body4.glb",
-      // [23, -2, -81],
-      // [0, -2, 0],
-      // [0, -Math.PI / 2, 0],
-      [0, 0, 5],
+    this.loader.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
+    this.loader.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
+
+    // load body 1
+    this.loader.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [-13, -1.5, -116],
       [0, 0, 0],
       1.6
     );
+
+    // load body 2
+    this.loader.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [-13, -1.5, -81],
+      [0, 0, 0],
+      1.6
+    );
+
+    // load body 3
+    this.loader.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [-56, -1.5, -81],
+      [0, Math.PI / 2, 0],
+      1.6
+    );
+    // this.loader.loadVisualModel(
+    //   "/assets/models/body4.glb",
+    //   [-56, -1.5, -81],
+    //   [0, Math.PI / 2, 0],
+    //   1.6
+    // );
+
+    // load body 4
+    this.loader.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [29, -1.5, -81],
+      [0, -Math.PI / 2, 0],
+      1.6
+    );
+    // this.loader.loadVisualModel(
+    //   "/assets/models/body4.glb",
+    //   [29, -1.5, -81],
+    //   [0, -Math.PI / 2, 0],
+    //   1.6
+    // );
   }
 
   initializeRenderer() {
@@ -123,7 +158,7 @@ class World {
 
     camera.position.x = 0;
     camera.position.y = 3;
-    camera.position.z = -70;
+    camera.position.z = -80;
 
     return camera;
   }
