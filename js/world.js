@@ -160,6 +160,8 @@ class World {
 async function main() {
   const world = new World();
   await world.loader.loadModels();
+
+  world.renderer.compile(world.scene, world.camera);
   world.animate();
 }
 main();

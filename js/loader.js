@@ -10,6 +10,7 @@ export class Loader {
     this.world = world;
     this.manager = this.initialize(world.context);
     this.textureLoader = new TextureLoader(this.manager);
+    this.gltfLoader = new GLTFLoader(this.manager);
     this.anisotropy = anisotropy;
   }
 
@@ -62,12 +63,12 @@ export class Loader {
   }
 
   async loadBodies() {
-    // back
-    await this.loadBody(
-      "/assets/models/body4.glb",
-      "/assets/models/body4_simple.glb",
-      [-13, -1.5, -116]
-    );
+    // // back
+    // await this.loadBody(
+    //   "/assets/models/body4.glb",
+    //   "/assets/models/body4_simple.glb",
+    //   [-13, -1.5, -116]
+    // );
 
     // middle
     await this.loadBody(
@@ -76,21 +77,21 @@ export class Loader {
       [-13, -1.5, -81]
     );
 
-    // left
-    await this.loadBody(
-      "/assets/models/body4.glb",
-      "/assets/models/body4_simple.glb",
-      [-56, -1.5, -81],
-      [0, Math.PI / 2, 0]
-    );
+    // // left
+    // await this.loadBody(
+    //   "/assets/models/body4.glb",
+    //   "/assets/models/body4_simple.glb",
+    //   [-56, -1.5, -81],
+    //   [0, Math.PI / 2, 0]
+    // );
 
-    // right
-    await this.loadBody(
-      "/assets/models/body4.glb",
-      "/assets/models/body4_simple.glb",
-      [29, -1.5, -81],
-      [0, -Math.PI / 2, 0]
-    );
+    // // right
+    // await this.loadBody(
+    //   "/assets/models/body4.glb",
+    //   "/assets/models/body4_simple.glb",
+    //   [29, -1.5, -81],
+    //   [0, -Math.PI / 2, 0]
+    // );
   }
 
   async loadSarcophagi() {
@@ -199,7 +200,7 @@ export class Loader {
   }
 
   async loadVisualModel(modelPath, position, rotation, scale, isBody) {
-    const model = await new GLTFLoader(this.manager).loadAsync(modelPath);
+    const model = await this.gltfLoader.loadAsync(modelPath);
 
     let mesh = model.scene;
     mesh.position.set(position[0] || 0, position[1] || 0, position[2] || 0);
