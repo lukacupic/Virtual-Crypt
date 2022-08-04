@@ -38,7 +38,7 @@ class World {
   }
 
   initializeRenderer() {
-    const renderer = new Three.WebGLRenderer({ antialias: false });
+    const renderer = new Three.WebGLRenderer({ antialias: true });
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -63,7 +63,7 @@ class World {
     const scene = new Three.Scene();
     scene.background = new Three.Color(0x000000);
 
-    scene.fog = new Three.Fog(scene.background, 1, 200);
+    scene.fog = new Three.Fog(scene.background, 1, 100);
 
     const floor = this.loader.loadFloor("/assets/textures/marble.jpg");
     floor.position.set(0, -1.85, 0);
@@ -73,8 +73,6 @@ class World {
 
     scene.add(floor);
 
-    // carpet
-
     const carpet = this.loader.loadCarpet("/assets/textures/carpet.jpg");
     carpet.receiveShadow = true;
     carpet.rotation.x = -Math.PI / 2;
@@ -83,8 +81,6 @@ class World {
     carpet.receiveShadow = true;
 
     scene.add(carpet);
-
-    // carpet 2
 
     const carpet2 = this.loader.loadCarpet2("/assets/textures/carpet.jpg");
     carpet2.receiveShadow = true;
@@ -157,8 +153,6 @@ class World {
       this.animate();
 
       this.stats.update();
-
-      console.log("Number of Triangles :", this.renderer.info.render.triangles);
     });
   }
 }

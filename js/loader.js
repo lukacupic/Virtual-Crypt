@@ -3,6 +3,8 @@ import * as Three from "three";
 import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
 import { TextureLoader } from "three";
 
+class ModelLoader {}
+
 export class Loader {
   constructor(world, anisotropy) {
     this.world = world;
@@ -32,38 +34,62 @@ export class Loader {
     return manager;
   }
 
-  async loadBodies() {
-    // back
-    this.loadVisualModel(
-      "/assets/models/body4_simple.glb",
-      [-13, -1.5, -116],
-      [0, 0, 0],
-      1.6
-    );
-
-    // middle
-    this.loadVisualModel(
-      "/assets/models/body4_simple.glb",
-      [-13, -1.5, -81],
-      [0, 0, 0],
+  async loadBody(path, pathSimple, position, rotation) {
+    const body = await this.loadVisualModel(path, [], [], 1.6, true);
+    const bodySimple = await this.loadVisualModel(
+      pathSimple,
+      [],
+      [],
       1.6,
       true
     );
 
+    const lod = new Three.LOD();
+    lod.addLevel(body, 0);
+    lod.addLevel(bodySimple, 20);
+
+    lod.position.x = position[0];
+    lod.position.y = position[1];
+    lod.position.z = position[2];
+
+    if (rotation) {
+      lod.rotation.x = rotation[0];
+      lod.rotation.y = rotation[1];
+      lod.rotation.z = rotation[2];
+    }
+
+    this.world.scene.add(lod);
+  }
+
+  async loadBodies() {
+    // back
+    await this.loadBody(
+      "/assets/models/body4.glb",
+      "/assets/models/body4_simple.glb",
+      [-13, -1.5, -116]
+    );
+
+    // middle
+    await this.loadBody(
+      "/assets/models/body4.glb",
+      "/assets/models/body4_simple.glb",
+      [-13, -1.5, -81]
+    );
+
     // left
-    this.loadVisualModel(
+    await this.loadBody(
+      "/assets/models/body4.glb",
       "/assets/models/body4_simple.glb",
       [-56, -1.5, -81],
-      [0, Math.PI / 2, 0],
-      1.6
+      [0, Math.PI / 2, 0]
     );
 
     // right
-    this.loadVisualModel(
+    await this.loadBody(
+      "/assets/models/body4.glb",
       "/assets/models/body4_simple.glb",
       [29, -1.5, -81],
-      [0, -Math.PI / 2, 0],
-      1.6
+      [0, -Math.PI / 2, 0]
     );
   }
 
@@ -105,7 +131,8 @@ export class Loader {
   async loadModels() {
     // this.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
     // this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
-    // this.loadSarcophagi();
+
+    this.loadSarcophagi();
     this.loadBodies();
   }
 
