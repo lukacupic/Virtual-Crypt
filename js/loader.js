@@ -81,23 +81,32 @@ export class Loader {
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
 
-  async loadPhysicalModel(modelPath, x = 0, y = 0, z = 0, scale = 1) {
-    const mesh = await this.loadVisualModel(modelPath, x, y, z, scale);
+  async loadPhysicalModel(modelPath, position, rotation, scale = 1) {
+    const mesh = await this.loadVisualModel(
+      modelPath,
+      position,
+      rotation,
+      scale
+    );
 
     this.world.controls.worldOctree.fromGraphNode(mesh);
 
     return mesh;
   }
 
-  async loadVisualModel(modelPath, x = 0, y = 0, z = 0, scale = 1) {
+  async loadVisualModel(modelPath, position, rotation, scale) {
     const model = await new GLTFLoader(this.manager).loadAsync(modelPath);
 
     let mesh = model.scene;
-    mesh.position.set(x, y, z);
+    mesh.position.set(position[0] || 0, position[1] || 0, position[2] || 0);
 
-    mesh.scale.set(scale, scale, scale);
+    mesh.rotateX(rotation[0] || 0);
+    mesh.rotateY(rotation[1] || 0);
+    mesh.rotateZ(rotation[2] || 0);
 
-    model.scene.traverse((node) => {
+    mesh.scale.set(scale || 1, scale || 1, scale || 1);
+
+    mesh.traverse((node) => {
       if (node.isMesh) {
         node.castShadow = true;
         node.receiveShadow = true;

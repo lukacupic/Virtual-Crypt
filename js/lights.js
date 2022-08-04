@@ -51,9 +51,13 @@ export class LightManager {
 
       bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
       bulbLight.position.set(p.x, p.y, p.z);
+
       bulbLight.castShadow = true;
-      bulbLight.shadow.bias = -0.5;
-      bulbLight.shadow.autoUpdate = false;
+      bulbLight.shadow.bias = -0.0005;
+      bulbLight.shadow.mapSize.width = 1024;
+      bulbLight.shadow.mapSize.height = 1024;
+      bulbLight.shadow.camera.top = bulbLight.shadow.camera.right = 1000;
+      bulbLight.shadow.camera.bottom = bulbLight.shadow.camera.left = -1000;
 
       return bulbLight;
     });

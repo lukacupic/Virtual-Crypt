@@ -1,7 +1,6 @@
 import * as Three from "three";
 
 import Stats from "https://unpkg.com/three@0.141.0/examples/jsm/libs/stats.module";
-import { GUI } from "https://unpkg.com/three@0.141.0/examples/jsm/libs/lil-gui.module.min.js";
 
 import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
@@ -22,7 +21,7 @@ class World {
     this.composer = this.initializeComposer();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
-    // this.audio = this.initializeAudio();
+    this.audio = this.initializeAudio();
     this.clock = this.initializeClock();
 
     const stats = Stats();
@@ -39,22 +38,52 @@ class World {
   }
 
   async initialize() {
-    this.loader.loadPhysicalModel(
-      "/assets/models/crypt-glass-optimized.glb",
-      0,
-      0,
-      0,
-      0.4
-    );
-    this.loader.loadVisualModel(
-      "/assets/models/crypt-optimized.glb",
-      0,
-      0,
-      0,
-      0.4
-    );
+    this.loader.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
+    this.loader.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
 
-    this.loader.loadPhysicalModel("/assets/models/vase.glb", 7, -1.85, -30, 8);
+    // load body 1
+    // this.loader.loadPhysicalModel(
+    //   "/assets/models/sarkofag.glb",
+    //   [-13, -1.5, -116],
+    //   [0, 0, 0],
+    //   1.6
+    // );
+
+    // load body 2
+    // this.loader.loadPhysicalModel(
+    //   "/assets/models/sarkofag.glb",
+    //   [-13, -1.5, -81],
+    //   [0, 0, 0],
+    //   1.6
+    // );
+
+    // load body 3
+    // this.loader.loadPhysicalModel(
+    //   "/assets/models/sarkofag.glb",
+    //   [-56, -1.5, -81],
+    //   [0, Math.PI / 2, 0],
+    //   1.6
+    // );
+    // this.loader.loadVisualModel(
+    //   "/assets/models/body4.glb",
+    //   [-56, -1.5, -81],
+    //   [0, Math.PI / 2, 0],
+    //   1.6
+    // );
+
+    // load body 4
+    // this.loader.loadPhysicalModel(
+    //   "/assets/models/sarkofag.glb",
+    //   [29, -1.5, -81],
+    //   [0, -Math.PI / 2, 0],
+    //   1.6
+    // );
+    // this.loader.loadVisualModel(
+    //   "/assets/models/body4.glb",
+    //   [29, -1.5, -81],
+    //   [0, -Math.PI / 2, 0],
+    //   1.6
+    // );
   }
 
   initializeRenderer() {
@@ -86,11 +115,9 @@ class World {
     scene.fog = new Three.Fog(scene.background, 1, 200);
 
     const floor = this.loader.loadFloor("/assets/textures/marble.jpg");
-    floor.receiveShadow = true;
     floor.position.set(0, -1.85, 0);
     floor.rotation.x = -Math.PI / 2;
 
-    floor.castShadow = false;
     floor.receiveShadow = true;
 
     scene.add(floor);
@@ -102,7 +129,6 @@ class World {
     carpet.rotation.x = -Math.PI / 2;
     carpet.position.set(-13, -1.8, 0);
 
-    carpet.castShadow = false;
     carpet.receiveShadow = true;
 
     scene.add(carpet);
@@ -114,7 +140,6 @@ class World {
     carpet2.rotation.x = -Math.PI / 2;
     carpet2.position.set(0, -1.8, -80.75);
 
-    carpet2.castShadow = false;
     carpet2.receiveShadow = true;
 
     scene.add(carpet2);
@@ -133,7 +158,7 @@ class World {
 
     camera.position.x = 0;
     camera.position.y = 3;
-    camera.position.z = -70;
+    camera.position.z = -80;
 
     return camera;
   }
@@ -146,7 +171,7 @@ class World {
   }
 
   initializeControls() {
-    return new FirstPersonController(this.camera, this.context, 12.5);
+    return new FirstPersonController(this.camera, this.context, 15);
   }
 
   initializeLights() {
