@@ -9,7 +9,7 @@ export class LightManager {
 
   initialize(scene) {
     scene.add(this.createAmbientLight());
-    scene.add(this.createHemisphereLight());
+    // scene.add(this.createHemisphereLight());
 
     const pointLights = this.createPointLights([
       { x: -13.1, y: 10.0, z: -116.76 },
@@ -24,11 +24,7 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new Three.AmbientLight(0xf5ffbd, 0.01);
-  }
-
-  createHemisphereLight() {
-    return new Three.HemisphereLight(0xffffbb, 0xf9ffbd, 0.1);
+    return new Three.AmbientLight(0xf5ffbd, 0.005);
   }
 
   createPointLights(positions) {
@@ -56,12 +52,8 @@ export class LightManager {
       bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
       bulbLight.position.set(p.x, p.y, p.z);
       bulbLight.castShadow = true;
-      bulbLight.shadow.bias = -0.0005;
-
-      // bulbLight.shadow.mapSize.width = 1024;
-      // bulbLight.shadow.mapSize.height = 1024;
-      // bulbLight.shadow.camera.top = bulbLight.shadow.camera.right = 1000;
-      // bulbLight.shadow.camera.bottom = bulbLight.shadow.camera.left = -1000;
+      bulbLight.shadow.bias = -0.5;
+      bulbLight.shadow.autoUpdate = false;
 
       return bulbLight;
     });
