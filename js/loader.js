@@ -32,6 +32,83 @@ export class Loader {
     return manager;
   }
 
+  async loadBodies() {
+    // back
+    this.loadVisualModel(
+      "/assets/models/body4_simple.glb",
+      [-13, -1.5, -116],
+      [0, 0, 0],
+      1.6
+    );
+
+    // middle
+    this.loadVisualModel(
+      "/assets/models/body4_simple.glb",
+      [-13, -1.5, -81],
+      [0, 0, 0],
+      1.6,
+      true
+    );
+
+    // left
+    this.loadVisualModel(
+      "/assets/models/body4_simple.glb",
+      [-56, -1.5, -81],
+      [0, Math.PI / 2, 0],
+      1.6
+    );
+
+    // right
+    this.loadVisualModel(
+      "/assets/models/body4_simple.glb",
+      [29, -1.5, -81],
+      [0, -Math.PI / 2, 0],
+      1.6
+    );
+  }
+
+  async loadSarcophagi() {
+    // back
+    this.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [-13, -1.5, -116],
+      [0, 0, 0],
+      1.6
+    );
+
+    // middle
+    this.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [-13, -1.5, -81],
+      [0, 0, 0],
+      1.6,
+      true
+    );
+
+    // left
+    this.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [-56, -1.5, -81],
+      [0, Math.PI / 2, 0],
+      1.6
+    );
+
+    // right
+    this.loadPhysicalModel(
+      "/assets/models/sarkofag.glb",
+      [29, -1.5, -81],
+      [0, -Math.PI / 2, 0],
+      1.6
+    );
+  }
+
+  async loadModels() {
+    // this.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
+    // this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
+    // this.loadSarcophagi();
+    this.loadBodies();
+  }
+
   loadTexture(path, repeatX, repeatY) {
     const texture = this.textureLoader.load(path);
 
@@ -94,7 +171,7 @@ export class Loader {
     return mesh;
   }
 
-  async loadVisualModel(modelPath, position, rotation, scale) {
+  async loadVisualModel(modelPath, position, rotation, scale, isBody) {
     const model = await new GLTFLoader(this.manager).loadAsync(modelPath);
 
     let mesh = model.scene;
@@ -118,7 +195,9 @@ export class Loader {
       }
     });
 
-    this.world.scene.add(mesh);
+    if (!isBody) {
+      this.world.scene.add(mesh);
+    }
 
     return mesh;
   }

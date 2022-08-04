@@ -12,6 +12,7 @@ export class LightManager {
     // scene.add(this.createHemisphereLight());
 
     const pointLights = this.createPointLights([
+      { x: -13.1, y: 10.0, z: -81 },
       { x: -13.1, y: 10.0, z: -116.76 },
       { x: -49.5, y: 10.0, z: -81 },
       { x: +23.0, y: 10.0, z: -81 },
@@ -24,13 +25,13 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new Three.AmbientLight(0xf5ffbd, 0.005);
+    return new Three.AmbientLight(0x8c6900, 0.02);
   }
 
   createPointLights(positions) {
-    const pointLightColor = 0xffee96;
-    const pointLightIntensity = 90;
-    const pointLightDistance = 40;
+    const pointLightColor = 0xf2c266;
+    const pointLightIntensity = 40;
+    const pointLightDistance = 20;
     const pointLightDecay = 2;
 
     const bulbGeometry = new Three.SphereGeometry(0.0, 16, 8);
@@ -52,12 +53,15 @@ export class LightManager {
       bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
       bulbLight.position.set(p.x, p.y, p.z);
 
+      // bulbLight.castShadow = true;
+      // bulbLight.shadow.bias = -0.0005;
+      // bulbLight.shadow.mapSize.width = 1024;
+      // bulbLight.shadow.mapSize.height = 1024;
+      // bulbLight.shadow.camera.top = bulbLight.shadow.camera.right = 1000;
+      // bulbLight.shadow.camera.bottom = bulbLight.shadow.camera.left = -1000;
+
       bulbLight.castShadow = true;
-      bulbLight.shadow.bias = -0.0005;
-      bulbLight.shadow.mapSize.width = 1024;
-      bulbLight.shadow.mapSize.height = 1024;
-      bulbLight.shadow.camera.top = bulbLight.shadow.camera.right = 1000;
-      bulbLight.shadow.camera.bottom = bulbLight.shadow.camera.left = -1000;
+      bulbLight.shadow.bias = -0.5;
 
       return bulbLight;
     });
