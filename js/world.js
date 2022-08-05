@@ -21,7 +21,7 @@ class World {
     this.composer = this.initializeComposer();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
-    // this.audio = this.initializeAudio();
+    this.audio = this.initializeAudio();
     this.clock = this.initializeClock();
 
     const stats = Stats();
@@ -153,6 +153,11 @@ class World {
       this.animate();
 
       this.stats.update();
+
+      console.log("Scene polycount:", this.renderer.info.render.triangles);
+      console.log("Active Drawcalls:", this.renderer.info.render.calls);
+      console.log("Textures in Memory", this.renderer.info.memory.textures);
+      console.log("Geometries in Memory", this.renderer.info.memory.geometries);
     });
   }
 }

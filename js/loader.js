@@ -1,7 +1,11 @@
 import * as Three from "three";
 
 import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
+import { MeshoptDecoder } from "https://unpkg.com/three@0.141.0/examples/jsm/libs/meshopt_decoder.module.js";
+
 import { TextureLoader } from "three";
+
+class Model {}
 
 class ModelLoader {}
 
@@ -10,7 +14,11 @@ export class Loader {
     this.world = world;
     this.manager = this.initialize(world.context);
     this.textureLoader = new TextureLoader(this.manager);
-    this.gltfLoader = new GLTFLoader(this.manager);
+
+    this.gltfLoader = new GLTFLoader(this.manager).setMeshoptDecoder(
+      MeshoptDecoder
+    );
+
     this.anisotropy = anisotropy;
   }
 
@@ -36,14 +44,8 @@ export class Loader {
   }
 
   async loadBody(path, pathSimple, position, rotation) {
-    const body = await this.loadVisualModel(path, [], [], 1.6, true);
-    const bodySimple = await this.loadVisualModel(
-      pathSimple,
-      [],
-      [],
-      1.6,
-      true
-    );
+    const body = await this.loadBodyModel(path, [], [], 1.6, true);
+    const bodySimple = await this.loadBodyModel(pathSimple, [], [], 1.6, true);
 
     const lod = new Three.LOD();
     lod.addLevel(body, 0);
@@ -63,35 +65,70 @@ export class Loader {
   }
 
   async loadBodies() {
-    // // back
+    const backCoords = [-13, -1.5, -116];
+    const middleCoords = [-13, -1.5, -81];
+    const leftCoords = [-56, -1.5, -81];
+    const rightCoords = [29, -1.5, -81];
+
+    const zeroRotation = [0, 0, 0];
+    const leftRotation = [0, Math.PI / 2, 0];
+    const rightRotation = [0, -Math.PI / 2, 0];
+
+    const scale = 1.6;
+
+    // back
     // await this.loadBody(
-    //   "/assets/models/body4.glb",
-    //   "/assets/models/body4_simple.glb",
+    //   "/assets/models/bodies/body4.glb",
+    //   "/assets/models/bodies/body4_simple.glb",
     //   [-13, -1.5, -116]
     // );
+    this.loadBodyModel(
+      "/assets/models/bodies/body2c.glb",
+      backCoords,
+      zeroRotation,
+      scale
+    );
 
     // middle
-    await this.loadBody(
-      "/assets/models/body4.glb",
-      "/assets/models/body4_simple.glb",
-      [-13, -1.5, -81]
+    // await this.loadBody(
+    //   "/assets/models/bodies/body4c.glb",
+    //   "/assets/models/bodies/body4sc.glb",
+    //   [-13, -1.5, -81]
+    // );
+    this.loadBodyModel(
+      "/assets/models/bodies/body4c.glb",
+      middleCoords,
+      zeroRotation,
+      scale
     );
 
     // // left
     // await this.loadBody(
-    //   "/assets/models/body4.glb",
-    //   "/assets/models/body4_simple.glb",
+    //   "/assets/models/bodies/body4.glb",
+    //   "/assets/models/bodies/body4s.glb",
     //   [-56, -1.5, -81],
     //   [0, Math.PI / 2, 0]
     // );
+    this.loadBodyModel(
+      "/assets/models/bodies/body1c.glb",
+      leftCoords,
+      leftRotation,
+      scale
+    );
 
     // // right
     // await this.loadBody(
-    //   "/assets/models/body4.glb",
-    //   "/assets/models/body4_simple.glb",
+    //   "/assets/models/bodies/body4.glb",
+    //   "/assets/models/bodies/body4s.glb",
     //   [29, -1.5, -81],
     //   [0, -Math.PI / 2, 0]
     // );
+    this.loadBodyModel(
+      "/assets/models/bodies/body3c.glb",
+      rightCoords,
+      rightRotation,
+      scale
+    );
   }
 
   async loadSarcophagi() {
@@ -199,6 +236,23 @@ export class Loader {
     return mesh;
   }
 
+  async loadBodyModel(modelPath, position, rotation, scale) {
+    const model = await this.gltfLoader.loadAsync(modelPath);
+
+    let mesh = model.scene;
+    mesh.position.set(position[0] || 0, position[1] || 0, position[2] || 0);
+
+    mesh.rotateX(rotation[0] || 0);
+    mesh.rotateY(rotation[1] || 0);
+    mesh.rotateZ(rotation[2] || 0);
+
+    mesh.scale.set(scale || 1, scale || 1, scale || 1);
+
+    this.world.scene.add(mesh);
+
+    return mesh;
+  }
+
   async loadVisualModel(modelPath, position, rotation, scale, isBody) {
     const model = await this.gltfLoader.loadAsync(modelPath);
 
@@ -223,9 +277,7 @@ export class Loader {
       }
     });
 
-    if (!isBody) {
-      this.world.scene.add(mesh);
-    }
+    this.world.scene.add(mesh);
 
     return mesh;
   }
