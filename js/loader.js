@@ -148,14 +148,14 @@ export class Loader {
   async loadShowcases() {
     this.loadPhysicalModel(
       "/assets/models/showcases/showcase1.glb",
-      [-5, -1.5, 30],
+      [-5, -1.5, -30],
       [0, 0, 0],
       1.1
     );
 
     this.loadPhysicalModel(
       "/assets/models/showcases/showcase1.glb",
-      [-20, -1.5, 30],
+      [-21, -1.5, -30],
       [0, Math.PI, 0],
       1.1
     );
