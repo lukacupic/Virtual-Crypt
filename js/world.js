@@ -105,7 +105,7 @@ class World {
 
     camera.position.x = 0;
     camera.position.y = 3;
-    camera.position.z = -80;
+    camera.position.z = -50;
 
     return camera;
   }

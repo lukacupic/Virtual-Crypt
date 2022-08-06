@@ -43,27 +43,6 @@ export class Loader {
     return manager;
   }
 
-  async loadBody(path, pathSimple, position, rotation) {
-    const body = await this.loadBodyModel(path, [], [], 1.6, true);
-    const bodySimple = await this.loadBodyModel(pathSimple, [], [], 1.6, true);
-
-    const lod = new Three.LOD();
-    lod.addLevel(body, 0);
-    lod.addLevel(bodySimple, 20);
-
-    lod.position.x = position[0];
-    lod.position.y = position[1];
-    lod.position.z = position[2];
-
-    if (rotation) {
-      lod.rotation.x = rotation[0];
-      lod.rotation.y = rotation[1];
-      lod.rotation.z = rotation[2];
-    }
-
-    this.world.scene.add(lod);
-  }
-
   async loadBodies() {
     const backCoords = [-13, -1.5, -116];
     const middleCoords = [-13, -1.5, -81];
@@ -166,12 +145,29 @@ export class Loader {
     );
   }
 
+  async loadShowcases() {
+    this.loadPhysicalModel(
+      "/assets/models/showcases/showcase1.glb",
+      [-5, -1.5, 30],
+      [0, 0, 0],
+      1.1
+    );
+
+    this.loadPhysicalModel(
+      "/assets/models/showcases/showcase1.glb",
+      [-20, -1.5, 30],
+      [0, Math.PI, 0],
+      1.1
+    );
+  }
+
   async loadModels() {
-    // this.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
-    // this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
+    this.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
+    this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
 
     this.loadSarcophagi();
-    this.loadBodies();
+    // this.loadBodies();
+    this.loadShowcases();
   }
 
   loadTexture(path, repeatX, repeatY) {
@@ -223,17 +219,25 @@ export class Loader {
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
 
-  async loadPhysicalModel(modelPath, position, rotation, scale = 1) {
-    const mesh = await this.loadVisualModel(
-      modelPath,
-      position,
-      rotation,
-      scale
-    );
+  async loadBody(path, pathSimple, position, rotation) {
+    const body = await this.loadBodyModel(path, [], [], 1.6, true);
+    const bodySimple = await this.loadBodyModel(pathSimple, [], [], 1.6, true);
 
-    this.world.controls.worldOctree.fromGraphNode(mesh);
+    const lod = new Three.LOD();
+    lod.addLevel(body, 0);
+    lod.addLevel(bodySimple, 20);
 
-    return mesh;
+    lod.position.x = position[0];
+    lod.position.y = position[1];
+    lod.position.z = position[2];
+
+    if (rotation) {
+      lod.rotation.x = rotation[0];
+      lod.rotation.y = rotation[1];
+      lod.rotation.z = rotation[2];
+    }
+
+    this.world.scene.add(lod);
   }
 
   async loadBodyModel(modelPath, position, rotation, scale) {
@@ -249,6 +253,19 @@ export class Loader {
     mesh.scale.set(scale || 1, scale || 1, scale || 1);
 
     this.world.scene.add(mesh);
+
+    return mesh;
+  }
+
+  async loadPhysicalModel(modelPath, position, rotation, scale = 1) {
+    const mesh = await this.loadVisualModel(
+      modelPath,
+      position,
+      rotation,
+      scale
+    );
+
+    this.world.controls.worldOctree.fromGraphNode(mesh);
 
     return mesh;
   }

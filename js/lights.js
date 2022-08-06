@@ -25,7 +25,7 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new Three.AmbientLight(0x8c6900, 0.02);
+    return new Three.AmbientLight(0x8c6900, 0.04);
   }
 
   createPointLights(positions) {
