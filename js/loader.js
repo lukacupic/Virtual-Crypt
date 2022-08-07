@@ -154,7 +154,7 @@ export class Loader {
     );
 
     this.loadPhysicalModel(
-      "/assets/models/showcases/showcase1.glb",
+      "/assets/models/showcases/showcase2.glb",
       [-21, -1.5, -30],
       [0, Math.PI, 0],
       1.1
@@ -166,7 +166,7 @@ export class Loader {
     this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
 
     this.loadSarcophagi();
-    // this.loadBodies();
+    this.loadBodies();
     this.loadShowcases();
   }
 
