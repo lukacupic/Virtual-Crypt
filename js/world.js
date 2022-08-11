@@ -21,7 +21,7 @@ class World {
     this.composer = this.initializeComposer();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
-    this.audio = this.initializeAudio();
+    // this.audio = this.initializeAudio();
     this.clock = this.initializeClock();
 
     const stats = Stats();
@@ -66,7 +66,7 @@ class World {
     scene.fog = new Three.Fog(scene.background, 1, 100);
 
     const floor = this.loader.loadFloor("/assets/textures/marble.jpg");
-    floor.position.set(0, -1.85, 0);
+    floor.position.set(0, 0, 0);
     floor.rotation.x = -Math.PI / 2;
 
     floor.receiveShadow = true;
@@ -76,7 +76,7 @@ class World {
     const carpet = this.loader.loadCarpet("/assets/textures/carpet.jpg");
     carpet.receiveShadow = true;
     carpet.rotation.x = -Math.PI / 2;
-    carpet.position.set(-13, -1.8, 0);
+    carpet.position.set(-13, 0.05, 0);
 
     carpet.receiveShadow = true;
 
@@ -85,7 +85,7 @@ class World {
     const carpet2 = this.loader.loadCarpet2("/assets/textures/carpet.jpg");
     carpet2.receiveShadow = true;
     carpet2.rotation.x = -Math.PI / 2;
-    carpet2.position.set(0, -1.8, -80.75);
+    carpet2.position.set(0, 0.05, -80.75);
 
     carpet2.receiveShadow = true;
 
@@ -102,10 +102,6 @@ class World {
 
     const camera = new Three.PerspectiveCamera(fov, aspect, near, far);
     camera.rotation.order = "YXZ";
-
-    camera.position.x = 0;
-    camera.position.y = 3;
-    camera.position.z = -50;
 
     return camera;
   }
@@ -154,10 +150,10 @@ class World {
 
       this.stats.update();
 
-      console.log("Scene polycount:", this.renderer.info.render.triangles);
-      console.log("Active Drawcalls:", this.renderer.info.render.calls);
-      console.log("Textures in Memory", this.renderer.info.memory.textures);
-      console.log("Geometries in Memory", this.renderer.info.memory.geometries);
+      // console.log("Scene polycount:", this.renderer.info.render.triangles);
+      // console.log("Active Drawcalls:", this.renderer.info.render.calls);
+      // console.log("Textures in Memory", this.renderer.info.memory.textures);
+      // console.log("Geometries in Memory", this.renderer.info.memory.geometries);
     });
   }
 }

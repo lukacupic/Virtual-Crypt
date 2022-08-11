@@ -43,131 +43,131 @@ export class Loader {
     return manager;
   }
 
-  async loadBodies() {
-    const backCoords = [-13, -1.5, -116];
-    const middleCoords = [-13, -1.5, -81];
-    const leftCoords = [-56, -1.5, -81];
-    const rightCoords = [29, -1.5, -81];
+  // async loadBodies() {
+  //   const backCoords = [-13, -1.5, -116];
+  //   const middleCoords = [-13, -1.5, -81];
+  //   const leftCoords = [-56, -1.5, -81];
+  //   const rightCoords = [29, -1.5, -81];
 
-    const zeroRotation = [0, 0, 0];
-    const leftRotation = [0, Math.PI / 2, 0];
-    const rightRotation = [0, -Math.PI / 2, 0];
+  //   const zeroRotation = [0, 0, 0];
+  //   const leftRotation = [0, Math.PI / 2, 0];
+  //   const rightRotation = [0, -Math.PI / 2, 0];
 
-    const scale = 1.6;
+  //   const scale = 1.6;
 
-    // back
-    // await this.loadBody(
-    //   "/assets/models/bodies/body4.glb",
-    //   "/assets/models/bodies/body4_simple.glb",
-    //   [-13, -1.5, -116]
-    // );
-    this.loadBodyModel(
-      "/assets/models/bodies/body2c.glb",
-      backCoords,
-      zeroRotation,
-      scale
-    );
+  //   // back
+  //   // await this.loadBody(
+  //   //   "/assets/models/bodies/body4.glb",
+  //   //   "/assets/models/bodies/body4_simple.glb",
+  //   //   [-13, -1.5, -116]
+  //   // );
+  //   this.loadBodyModel(
+  //     "/assets/models/bodies/body4c.glb",
+  //     backCoords,
+  //     zeroRotation,
+  //     scale
+  //   );
 
-    // middle
-    // await this.loadBody(
-    //   "/assets/models/bodies/body4c.glb",
-    //   "/assets/models/bodies/body4sc.glb",
-    //   [-13, -1.5, -81]
-    // );
-    this.loadBodyModel(
-      "/assets/models/bodies/body4c.glb",
-      middleCoords,
-      zeroRotation,
-      scale
-    );
+  //   // middle
+  //   // await this.loadBody(
+  //   //   "/assets/models/bodies/body4c.glb",
+  //   //   "/assets/models/bodies/body4sc.glb",
+  //   //   [-13, -1.5, -81]
+  //   // );
+  //   this.loadBodyModel(
+  //     "/assets/models/bodies/body4c.glb",
+  //     middleCoords,
+  //     zeroRotation,
+  //     scale
+  //   );
 
-    // // left
-    // await this.loadBody(
-    //   "/assets/models/bodies/body4.glb",
-    //   "/assets/models/bodies/body4s.glb",
-    //   [-56, -1.5, -81],
-    //   [0, Math.PI / 2, 0]
-    // );
-    this.loadBodyModel(
-      "/assets/models/bodies/body1c.glb",
-      leftCoords,
-      leftRotation,
-      scale
-    );
+  //   // // left
+  //   // await this.loadBody(
+  //   //   "/assets/models/bodies/body4.glb",
+  //   //   "/assets/models/bodies/body4s.glb",
+  //   //   [-56, -1.5, -81],
+  //   //   [0, Math.PI / 2, 0]
+  //   // );
+  //   this.loadBodyModel(
+  //     "/assets/models/bodies/body4c.glb",
+  //     leftCoords,
+  //     leftRotation,
+  //     scale
+  //   );
 
-    // // right
-    // await this.loadBody(
-    //   "/assets/models/bodies/body4.glb",
-    //   "/assets/models/bodies/body4s.glb",
-    //   [29, -1.5, -81],
-    //   [0, -Math.PI / 2, 0]
-    // );
-    this.loadBodyModel(
-      "/assets/models/bodies/body3c.glb",
-      rightCoords,
-      rightRotation,
-      scale
-    );
-  }
+  //   // // right
+  //   // await this.loadBody(
+  //   //   "/assets/models/bodies/body4.glb",
+  //   //   "/assets/models/bodies/body4s.glb",
+  //   //   [29, -1.5, -81],
+  //   //   [0, -Math.PI / 2, 0]
+  //   // );
+  //   this.loadBodyModel(
+  //     "/assets/models/bodies/body4c.glb",
+  //     rightCoords,
+  //     rightRotation,
+  //     scale
+  //   );
+  // }
 
-  async loadSarcophagi() {
-    // back
-    this.loadPhysicalModel(
-      "/assets/models/sarkofag.glb",
-      [-13, -1.5, -116],
-      [0, 0, 0],
-      1.6
-    );
+  // async loadSarcophagi() {
+  //   // back
+  //   this.loadPhysicalModel(
+  //     "/assets/models/sarkofagc.glb",
+  //     [-13, -1.5, -116],
+  //     [0, 0, 0],
+  //     1.6
+  //   );
 
-    // middle
-    this.loadPhysicalModel(
-      "/assets/models/sarkofag.glb",
-      [-13, -1.5, -81],
-      [0, 0, 0],
-      1.6,
-      true
-    );
+  //   // middle
+  //   this.loadPhysicalModel(
+  //     "/assets/models/sarkofagc.glb",
+  //     [-13, -1.5, -81],
+  //     [0, 0, 0],
+  //     1.6,
+  //     true
+  //   );
 
-    // left
-    this.loadPhysicalModel(
-      "/assets/models/sarkofag.glb",
-      [-56, -1.5, -81],
-      [0, Math.PI / 2, 0],
-      1.6
-    );
+  //   // left
+  //   this.loadPhysicalModel(
+  //     "/assets/models/sarkofagc.glb",
+  //     [-56, -1.5, -81],
+  //     [0, Math.PI / 2, 0],
+  //     1.6
+  //   );
 
-    // right
-    this.loadPhysicalModel(
-      "/assets/models/sarkofag.glb",
-      [29, -1.5, -81],
-      [0, -Math.PI / 2, 0],
-      1.6
-    );
-  }
+  //   // right
+  //   this.loadPhysicalModel(
+  //     "/assets/models/sarkofagc.glb",
+  //     [29, -1.5, -81],
+  //     [0, -Math.PI / 2, 0],
+  //     1.6
+  //   );
+  // }
 
-  async loadShowcases() {
-    this.loadPhysicalModel(
-      "/assets/models/showcases/showcase1.glb",
-      [-5, -1.5, -30],
-      [0, 0, 0],
-      1.1
-    );
+  // async loadShowcases() {
+  //   this.loadPhysicalModel(
+  //     "/assets/models/showcases/showcase1.glb",
+  //     [-5, -1.5, -30],
+  //     [0, 0, 0],
+  //     1.1
+  //   );
 
-    this.loadPhysicalModel(
-      "/assets/models/showcases/showcase2.glb",
-      [-21, -1.5, -30],
-      [0, Math.PI, 0],
-      1.1
-    );
-  }
+  //   this.loadPhysicalModel(
+  //     "/assets/models/showcases/showcase2.glb",
+  //     [-21, -1.5, -30],
+  //     [0, Math.PI, 0],
+  //     1.1
+  //   );
+  // }
 
   async loadModels() {
-    this.loadPhysicalModel("/assets/models/glass.glb", [], [], 0.4);
+    this.loadPhysicalModel("/assets/models/glassc.glb", [], [], 0.4);
     this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
 
-    this.loadSarcophagi();
-    this.loadBodies();
-    this.loadShowcases();
+    // this.loadSarcophagi();
+    // this.loadBodies();
+    // this.loadShowcases();
   }
 
   loadTexture(path, repeatX, repeatY) {
@@ -219,43 +219,43 @@ export class Loader {
     return new Three.Mesh(carpetGeometry, carpetMaterial);
   }
 
-  async loadBody(path, pathSimple, position, rotation) {
-    const body = await this.loadBodyModel(path, [], [], 1.6, true);
-    const bodySimple = await this.loadBodyModel(pathSimple, [], [], 1.6, true);
+  // async loadBody(path, pathSimple, position, rotation) {
+  //   const body = await this.loadBodyModel(path, [], [], 1.6, true);
+  //   const bodySimple = await this.loadBodyModel(pathSimple, [], [], 1.6, true);
 
-    const lod = new Three.LOD();
-    lod.addLevel(body, 0);
-    lod.addLevel(bodySimple, 20);
+  //   const lod = new Three.LOD();
+  //   lod.addLevel(body, 0);
+  //   lod.addLevel(bodySimple, 20);
 
-    lod.position.x = position[0];
-    lod.position.y = position[1];
-    lod.position.z = position[2];
+  //   lod.position.x = position[0];
+  //   lod.position.y = position[1];
+  //   lod.position.z = position[2];
 
-    if (rotation) {
-      lod.rotation.x = rotation[0];
-      lod.rotation.y = rotation[1];
-      lod.rotation.z = rotation[2];
-    }
+  //   if (rotation) {
+  //     lod.rotation.x = rotation[0];
+  //     lod.rotation.y = rotation[1];
+  //     lod.rotation.z = rotation[2];
+  //   }
 
-    this.world.scene.add(lod);
-  }
+  //   this.world.scene.add(lod);
+  // }
 
-  async loadBodyModel(modelPath, position, rotation, scale) {
-    const model = await this.gltfLoader.loadAsync(modelPath);
+  // async loadBodyModel(modelPath, position, rotation, scale) {
+  //   const model = await this.gltfLoader.loadAsync(modelPath);
 
-    let mesh = model.scene;
-    mesh.position.set(position[0] || 0, position[1] || 0, position[2] || 0);
+  //   let mesh = model.scene;
+  //   mesh.position.set(position[0] || 0, position[1] || 0, position[2] || 0);
 
-    mesh.rotateX(rotation[0] || 0);
-    mesh.rotateY(rotation[1] || 0);
-    mesh.rotateZ(rotation[2] || 0);
+  //   mesh.rotateX(rotation[0] || 0);
+  //   mesh.rotateY(rotation[1] || 0);
+  //   mesh.rotateZ(rotation[2] || 0);
 
-    mesh.scale.set(scale || 1, scale || 1, scale || 1);
+  //   mesh.scale.set(scale || 1, scale || 1, scale || 1);
 
-    this.world.scene.add(mesh);
+  //   this.world.scene.add(mesh);
 
-    return mesh;
-  }
+  //   return mesh;
+  // }
 
   async loadPhysicalModel(modelPath, position, rotation, scale = 1) {
     const mesh = await this.loadVisualModel(

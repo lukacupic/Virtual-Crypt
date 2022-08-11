@@ -14,8 +14,8 @@ export class FirstPersonController {
     this.worldOctree = new Octree();
 
     this.playerX = -13;
-    this.playerY = 0;
-    this.playerZ = 0;
+    this.playerY = 1;
+    this.playerZ = -75;
     this.radius = 1.5;
 
     this.playerCollider = new Capsule(

@@ -21,7 +21,7 @@ export class LightManager {
       { x: -13.1, y: 10.0, z: +95.0 },
     ]);
 
-    scene.add(...pointLights);
+    // scene.add(...pointLights);
   }
 
   createAmbientLight() {
