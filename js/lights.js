@@ -25,7 +25,8 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new Three.AmbientLight(0x8c6900, 0.04);
+    // return new Three.AmbientLight(0x8c6900, 0.04);
+    return new Three.AmbientLight(0xffffff, 0.05);
   }
 
   createPointLights(positions) {
@@ -53,12 +54,12 @@ export class LightManager {
       bulbLight.add(new Three.Mesh(bulbGeometry, bulbMaterial));
       bulbLight.position.set(p.x, p.y, p.z);
 
-      // bulbLight.castShadow = true;
-      // bulbLight.shadow.bias = -0.0005;
-      // bulbLight.shadow.mapSize.width = 1024;
-      // bulbLight.shadow.mapSize.height = 1024;
-      // bulbLight.shadow.camera.top = bulbLight.shadow.camera.right = 1000;
-      // bulbLight.shadow.camera.bottom = bulbLight.shadow.camera.left = -1000;
+      bulbLight.castShadow = true;
+      bulbLight.shadow.bias = -0.0005;
+      bulbLight.shadow.mapSize.width = 1024;
+      bulbLight.shadow.mapSize.height = 1024;
+      bulbLight.shadow.camera.top = bulbLight.shadow.camera.right = 1000;
+      bulbLight.shadow.camera.bottom = bulbLight.shadow.camera.left = -1000;
 
       bulbLight.castShadow = true;
       bulbLight.shadow.bias = -0.5;

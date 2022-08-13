@@ -15,7 +15,7 @@ export class FirstPersonController {
 
     this.playerX = -13;
     this.playerY = 1;
-    this.playerZ = -75;
+    this.playerZ = -30;
     this.radius = 1.5;
 
     this.playerCollider = new Capsule(

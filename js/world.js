@@ -46,9 +46,12 @@ class World {
     renderer.physicallyCorrectLights = true;
     renderer.outputEncoding = Three.sRGBEncoding;
     renderer.toneMapping = Three.ReinhardToneMapping;
+    renderer.toneMappingExposure = 0.5;
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = Three.PCFSoftShadowMap;
+
+    renderer.colorManagement = true;
 
     this.context.body.appendChild(renderer.domElement);
 
@@ -63,7 +66,7 @@ class World {
     const scene = new Three.Scene();
     scene.background = new Three.Color(0x000000);
 
-    scene.fog = new Three.Fog(scene.background, 1, 100);
+    scene.fog = new Three.Fog(scene.background, 1, 250);
 
     const floor = this.loader.loadFloor("/assets/textures/marble.jpg");
     floor.position.set(0, 0, 0);
@@ -73,23 +76,23 @@ class World {
 
     scene.add(floor);
 
-    const carpet = this.loader.loadCarpet("/assets/textures/carpet.jpg");
-    carpet.receiveShadow = true;
-    carpet.rotation.x = -Math.PI / 2;
-    carpet.position.set(-13, 0.05, 0);
+    // const carpet = this.loader.loadCarpet("/assets/textures/carpet.jpg");
+    // carpet.receiveShadow = true;
+    // carpet.rotation.x = -Math.PI / 2;
+    // carpet.position.set(-13, 0.05, 0);
 
-    carpet.receiveShadow = true;
+    // carpet.receiveShadow = true;
 
-    scene.add(carpet);
+    // scene.add(carpet);
 
-    const carpet2 = this.loader.loadCarpet2("/assets/textures/carpet.jpg");
-    carpet2.receiveShadow = true;
-    carpet2.rotation.x = -Math.PI / 2;
-    carpet2.position.set(0, 0.05, -80.75);
+    // const carpet2 = this.loader.loadCarpet2("/assets/textures/carpet.jpg");
+    // carpet2.receiveShadow = true;
+    // carpet2.rotation.x = -Math.PI / 2;
+    // carpet2.position.set(0, 0.05, -80.75);
 
-    carpet2.receiveShadow = true;
+    // carpet2.receiveShadow = true;
 
-    scene.add(carpet2);
+    // scene.add(carpet2);
 
     return scene;
   }
