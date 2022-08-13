@@ -270,7 +270,7 @@ export class Loader {
     return mesh;
   }
 
-  async loadVisualModel(modelPath, position, rotation, scale, isBody) {
+  async loadVisualModel(modelPath, position, rotation, scale) {
     const model = await this.gltfLoader.loadAsync(modelPath);
 
     let mesh = model.scene;
@@ -291,6 +291,9 @@ export class Loader {
         if (node.material.map) {
           node.material.map.anisotropy = this.anisotropy;
         }
+      } else if (node.isLight) {
+        node.shadow.camera.near = 0.001;
+        node.shadow.camera.updateProjectionMatrix();
       }
     });
 

@@ -61,9 +61,6 @@ export class LightManager {
       bulbLight.shadow.camera.top = bulbLight.shadow.camera.right = 1000;
       bulbLight.shadow.camera.bottom = bulbLight.shadow.camera.left = -1000;
 
-      bulbLight.castShadow = true;
-      bulbLight.shadow.bias = -0.5;
-
       return bulbLight;
     });
 
