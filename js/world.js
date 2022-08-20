@@ -1,4 +1,4 @@
-import * as Three from "three";
+import * as THREE from "three";
 
 import Stats from "https://unpkg.com/three@0.141.0/examples/jsm/libs/stats.module";
 
@@ -7,6 +7,7 @@ import { LightManager } from "./lights.js";
 import { AudioManager } from "./audio.js";
 import { Loader } from "./loader.js";
 
+import { RGBELoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/RGBELoader.js";
 import { EffectComposer } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/RenderPass.js";
 
@@ -38,20 +39,18 @@ class World {
   }
 
   initializeRenderer() {
-    const renderer = new Three.WebGLRenderer({ antialias: true });
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
 
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
 
     renderer.physicallyCorrectLights = true;
-    renderer.outputEncoding = Three.sRGBEncoding;
-    renderer.toneMapping = Three.ReinhardToneMapping;
+    renderer.outputEncoding = THREE.sRGBEncoding;
+    renderer.toneMapping = THREE.ReinhardToneMapping;
     renderer.toneMappingExposure = 0.5;
 
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = Three.PCFSoftShadowMap;
-
-    renderer.colorManagement = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.context.body.appendChild(renderer.domElement);
 
@@ -63,36 +62,19 @@ class World {
   }
 
   initializeScene() {
-    const scene = new Three.Scene();
-    scene.background = new Three.Color(0x000000);
+    const scene = new THREE.Scene();
+    scene.background = "#000000";
+    scene.fog = new THREE.Fog(scene.background, 1, 120);
 
-    scene.fog = new Three.Fog(scene.background, 1, 250);
+    new RGBELoader().load(
+      "/assets/textures/spiaggia_di_mondello_2k.hdr",
+      (texture) => {
+        texture.mapping = THREE.EquirectangularReflectionMapping;
 
-    const floor = this.loader.loadFloor("/assets/textures/marble.jpg");
-    floor.position.set(0, 0, 0);
-    floor.rotation.x = -Math.PI / 2;
-
-    floor.receiveShadow = true;
-
-    scene.add(floor);
-
-    // const carpet = this.loader.loadCarpet("/assets/textures/carpet.jpg");
-    // carpet.receiveShadow = true;
-    // carpet.rotation.x = -Math.PI / 2;
-    // carpet.position.set(-13, 0.05, 0);
-
-    // carpet.receiveShadow = true;
-
-    // scene.add(carpet);
-
-    // const carpet2 = this.loader.loadCarpet2("/assets/textures/carpet.jpg");
-    // carpet2.receiveShadow = true;
-    // carpet2.rotation.x = -Math.PI / 2;
-    // carpet2.position.set(0, 0.05, -80.75);
-
-    // carpet2.receiveShadow = true;
-
-    // scene.add(carpet2);
+        // scene.background = texture;
+        // scene.environment = texture;
+      }
+    );
 
     return scene;
   }
@@ -103,7 +85,7 @@ class World {
     const near = 1.0;
     const far = 300.0;
 
-    const camera = new Three.PerspectiveCamera(fov, aspect, near, far);
+    const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     camera.rotation.order = "YXZ";
 
     return camera;
@@ -132,7 +114,7 @@ class World {
   }
 
   initializeClock() {
-    return new Three.Clock();
+    return new THREE.Clock();
   }
 
   onWindowResize() {
@@ -149,6 +131,7 @@ class World {
 
       this.controls.update(delta);
       this.composer.render();
+
       this.animate();
 
       this.stats.update();

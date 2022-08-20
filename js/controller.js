@@ -1,4 +1,4 @@
-import * as Three from "three";
+import * as THREE from "three";
 import { Octree } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Octree.js";
 import { Capsule } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Capsule.js";
 
@@ -7,8 +7,8 @@ export class FirstPersonController {
     this.camera = camera;
     this.document = document;
 
-    this.velocity = new Three.Vector3();
-    this.direction = new Three.Vector3();
+    this.velocity = new THREE.Vector3();
+    this.direction = new THREE.Vector3();
     this.speed = speed;
 
     this.worldOctree = new Octree();
@@ -19,8 +19,8 @@ export class FirstPersonController {
     this.radius = 1.5;
 
     this.playerCollider = new Capsule(
-      new Three.Vector3(this.playerX, this.playerY + 0.1, this.playerZ),
-      new Three.Vector3(this.playerX, this.playerY + 2.85, this.playerZ),
+      new THREE.Vector3(this.playerX, this.playerY + 0.1, this.playerZ),
+      new THREE.Vector3(this.playerX, this.playerY + 2.85, this.playerZ),
       this.radius
     );
 
