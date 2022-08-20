@@ -9,10 +9,9 @@ export class LightManager {
 
   initialize(scene) {
     scene.add(this.createAmbientLight());
-    // scene.add(this.createHemisphereLight());
   }
 
   createAmbientLight() {
-    return new THREE.AmbientLight(0xffffff, 0.05);
+    return new THREE.AmbientLight(0xffffff, 1);
   }
 }

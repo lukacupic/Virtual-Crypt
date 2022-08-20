@@ -10,6 +10,7 @@ import { Loader } from "./loader.js";
 import { RGBELoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/RGBELoader.js";
 import { EffectComposer } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/EffectComposer.js";
 import { RenderPass } from "https://unpkg.com/three@0.141.0/examples/jsm/postprocessing/RenderPass.js";
+import { Reflector } from "https://unpkg.com/three@0.141.0/examples/jsm/objects/Reflector.js";
 
 class World {
   constructor() {
@@ -47,7 +48,7 @@ class World {
     renderer.physicallyCorrectLights = true;
     renderer.outputEncoding = THREE.sRGBEncoding;
     renderer.toneMapping = THREE.ReinhardToneMapping;
-    renderer.toneMappingExposure = 0.5;
+    renderer.toneMappingExposure = 0.3;
 
     renderer.shadowMap.enabled = true;
     renderer.shadowMap.type = THREE.PCFSoftShadowMap;
@@ -64,17 +65,27 @@ class World {
   initializeScene() {
     const scene = new THREE.Scene();
     scene.background = "#000000";
-    scene.fog = new THREE.Fog(scene.background, 1, 120);
+    scene.fog = new THREE.Fog(scene.background, 1, 200);
 
     new RGBELoader().load(
-      "/assets/textures/spiaggia_di_mondello_2k.hdr",
+      "/assets/textures/castle_zavelstein_cellar_2k",
       (texture) => {
         texture.mapping = THREE.EquirectangularReflectionMapping;
 
-        // scene.background = texture;
-        // scene.environment = texture;
+        scene.background = texture;
+        scene.environment = texture;
       }
     );
+
+    const planeGeo = new THREE.PlaneGeometry(500, 500);
+    const groundMirror = new Reflector(planeGeo, {
+      clipBias: 0.0003,
+      textureWidth: 1024,
+      textureHeight: 1024,
+      color: "#0d0d0d",
+    });
+    groundMirror.rotateX(-Math.PI / 2);
+    scene.add(groundMirror);
 
     return scene;
   }
