@@ -19,6 +19,13 @@ export class FirstPersonController {
 
     this.radius = 1.5;
 
+    this._euler = new THREE.Euler(0, 0, 0, "YXZ");
+    this._vector = new THREE.Vector3();
+    this._PI_2 = Math.PI / 2;
+    this.minPolarAngle = 0;
+    this.maxPolarAngle = Math.PI;
+    this.pointerSpeed = 1.0;
+
     this.playerCollider = new Capsule(
       new THREE.Vector3(this.playerX, this.playerY + 0.1, this.playerZ),
       new THREE.Vector3(this.playerX, this.playerY + 3.0, this.playerZ),
@@ -44,8 +51,9 @@ export class FirstPersonController {
 
     this.document.body.addEventListener("mousemove", (event) => {
       if (this.document.pointerLockElement === this.document.body) {
-        this.camera.rotation.y -= event.movementX / 750;
-        this.camera.rotation.x -= event.movementY / 750;
+        let factor = 1000;
+        this.camera.rotation.y -= event.movementX / factor;
+        this.camera.rotation.x -= event.movementY / factor;
       }
     });
 

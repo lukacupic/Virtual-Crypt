@@ -1,5 +1,5 @@
-﻿import { defaultSSROptions } from "./screen-space-reflections.js";
-import { Pane } from "./tweakpane.js";
+﻿import { defaultSSROptions } from "./lib/screen-space-reflections.js";
+import { Pane } from "./lib/tweakpane.js";
 
 export class SSRDebugGUI {
   constructor(ssrEffect, params = defaultSSROptions) {
