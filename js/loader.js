@@ -1,6 +1,8 @@
 import * as THREE from "three";
 
-import { GLTFLoader } from "https://unpkg.com/three@0.141.0/examples/jsm/loaders/GLTFLoader.js";
+import { LightManager } from "./lights.js";
+
+import { GLTFLoader } from "https://unpkg.com/three@0.143.0/examples/jsm/loaders/GLTFLoader.js";
 
 class Model {}
 
@@ -77,7 +79,7 @@ export class Loader {
           node.material.map.anisotropy = this.anisotropy;
         }
       } else if (node.isLight) {
-        node.intensity /= 50;
+        LightManager.configurePointLight(node);
       }
     });
 

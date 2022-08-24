@@ -1,6 +1,6 @@
 import * as THREE from "three";
-import { Octree } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Octree.js";
-import { Capsule } from "https://unpkg.com/three@0.141.0/examples/jsm/math/Capsule.js";
+import { Octree } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Octree.js";
+import { Capsule } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Capsule.js";
 
 export class FirstPersonController {
   constructor(camera, document, speed) {
@@ -15,12 +15,13 @@ export class FirstPersonController {
 
     this.playerX = -13;
     this.playerY = 1;
-    this.playerZ = -30;
+    this.playerZ = -15;
+
     this.radius = 1.5;
 
     this.playerCollider = new Capsule(
       new THREE.Vector3(this.playerX, this.playerY + 0.1, this.playerZ),
-      new THREE.Vector3(this.playerX, this.playerY + 2.85, this.playerZ),
+      new THREE.Vector3(this.playerX, this.playerY + 3.0, this.playerZ),
       this.radius
     );
 
