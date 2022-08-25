@@ -16,6 +16,10 @@ import {
   EdgeDetectionMode,
   BlendFunction,
   ColorChannel,
+  DepthOfFieldEffect,
+  DepthEffect,
+  KernelSize,
+  VignetteEffect,
 } from "./lib/postprocessing.js";
 
 /* SSR */
@@ -146,8 +150,9 @@ class World {
     const composer = new EffectComposer(this.renderer);
     composer.addPass(new RenderPass(this.scene, this.camera));
 
-    // composer.addPass(this.createSSRPass());
-    composer.addPass(this.createSSAOPass(composer));
+    composer.addPass(this.createSSRPass());
+    // composer.addPass(this.createSSAOPass(composer));
+    // this.createDOFPass(composer);
 
     return composer;
   }
@@ -163,7 +168,7 @@ class World {
       ior: 1.7,
 
       maxRoughness: 0.0,
-      maxDepthDifference: 100.0,
+      maxDepthDifference: 10.0,
 
       blend: 1.0,
       correction: 1.0,
@@ -214,22 +219,22 @@ class World {
     smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
 
     const ssaoOptions = {
-      resolutionScale: 0.25,
+      resolutionScale: 0.5,
       blendFunction: BlendFunction.MULTIPLY,
       distanceScaling: true,
       depthAwareUpsampling: true,
-      samples: 11,
+      samples: 20,
       rings: 7,
-      radius: 0.085,
+      radius: 0.052,
       distanceThreshold: 0.97, // Render up to a distance of ~20 world units
       distanceFalloff: 0.03, // with an additional ~2.5 units of falloff.
       rangeThreshold: 0.0005, // Occlusion proximity of ~0.3 world units
       rangeFalloff: 0.001, // with ~0.1 units of falloff.
       minRadiusScale: 0.33,
-      intensity: 4,
+      intensity: 10,
       bias: 0,
       fade: 0,
-      luminanceInfluence: 0,
+      luminanceInfluence: 5,
       color: null,
     };
     const ssaoEffect = new SSAOEffect(
@@ -418,6 +423,61 @@ class World {
     }
 
     return effectPass;
+  }
+
+  createDOFPass(composer) {
+    const assets = this.load();
+    const smaaEffect = new SMAAEffect(
+      assets["smaa-search"],
+      assets["smaa-area"],
+      SMAAPreset.HIGH,
+      EdgeDetectionMode.DEPTH
+    );
+
+    smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
+
+    const depthOfFieldEffect = new DepthOfFieldEffect(this.camera, {
+      focusDistance: 0.0,
+      focalLength: 0.25,
+      bokehScale: 1.0,
+      height: 720,
+    });
+
+    const depthEffect = new DepthEffect({
+      blendFunction: BlendFunction.SKIP,
+    });
+
+    const vignetteEffect = new VignetteEffect({
+      eskil: false,
+      offset: 0.35,
+      darkness: 0.5,
+    });
+
+    const cocTextureEffect = new TextureEffect({
+      blendFunction: BlendFunction.SKIP,
+      texture: depthOfFieldEffect.renderTargetCoC.texture,
+    });
+
+    const effectPass = new EffectPass(
+      this.camera,
+      depthOfFieldEffect,
+      vignetteEffect,
+      cocTextureEffect,
+      depthEffect
+    );
+
+    const smaaPass = new EffectPass(this.camera, smaaEffect);
+
+    this.depthEffect = depthEffect;
+    this.vignetteEffect = vignetteEffect;
+    this.depthOfFieldEffect = depthOfFieldEffect;
+    this.cocTextureEffect = cocTextureEffect;
+
+    this.effectPass = effectPass;
+    this.smaaPass = smaaPass;
+
+    composer.addPass(effectPass);
+    composer.addPass(smaaPass);
   }
 
   initializeControls() {

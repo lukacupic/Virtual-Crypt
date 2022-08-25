@@ -15,7 +15,7 @@ export class FirstPersonController {
 
     this.playerX = -13;
     this.playerY = 1;
-    this.playerZ = -15;
+    this.playerZ = 150;
 
     this.radius = 1.5;
 
