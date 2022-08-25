@@ -7,6 +7,7 @@ import {
   EffectPass,
   RenderPass,
   NormalPass,
+  ShaderPass,
   DepthDownsamplingPass,
   SMAAImageLoader,
   SMAAEffect,
@@ -20,6 +21,8 @@ import {
   DepthEffect,
   KernelSize,
   VignetteEffect,
+  CopyMaterial,
+  PredicationMode,
 } from "./lib/postprocessing.js";
 
 /* SSR */
@@ -99,7 +102,7 @@ class World {
     const scene = new THREE.Scene();
 
     scene.background = "#000000";
-    scene.fog = new THREE.Fog(scene.background, 1, 225);
+    scene.fog = new THREE.Fog(scene.background, 1, 250);
 
     const planeGeo = new THREE.PlaneGeometry(500, 500);
     const groundMirror = new Reflector(planeGeo, {
@@ -142,8 +145,6 @@ class World {
         resolve();
       }
     });
-
-    return assets;
   }
 
   initializeComposer() {
@@ -151,8 +152,7 @@ class World {
     composer.addPass(new RenderPass(this.scene, this.camera));
 
     composer.addPass(this.createSSRPass());
-    // composer.addPass(this.createSSAOPass(composer));
-    // this.createDOFPass(composer);
+    this.createAAPass(composer);
 
     return composer;
   }
@@ -162,10 +162,10 @@ class World {
       intensity: 1.0,
       exponent: 8.0,
       distance: 10.0,
-      fade: 2.5,
+      fade: 0.1,
       roughnessFade: 0.0,
       thickness: 0.0,
-      ior: 1.7,
+      ior: 1.03,
 
       maxRoughness: 0.0,
       maxDepthDifference: 10.0,
@@ -192,292 +192,49 @@ class World {
     };
 
     const ssrEffect = new SSREffect(this.scene, this.camera, options);
+    // const gui = new SSRDebugGUI(ssrEffect, options);
     return new EffectPass(this.camera, ssrEffect);
   }
 
-  createSSAOPass(composer) {
-    const normalPass = new NormalPass(this.scene, this.camera);
-    const depthDownsamplingPass = new DepthDownsamplingPass({
-      normalBuffer: normalPass.texture,
-      resolutionScale: 0.5,
-    });
-
-    const capabilities = this.renderer.capabilities;
-    const normalDepthBuffer = capabilities.isWebGL2
-      ? depthDownsamplingPass.texture
-      : null;
-
+  createAAPass(composer) {
     const assets = this.load();
-
     const smaaEffect = new SMAAEffect(
       assets["smaa-search"],
       assets["smaa-area"],
       SMAAPreset.HIGH,
-      EdgeDetectionMode.DEPTH
+      EdgeDetectionMode.COLOR
     );
 
-    smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
+    smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.02);
+    smaaEffect.edgeDetectionMaterial.setPredicationMode(PredicationMode.DEPTH);
+    smaaEffect.edgeDetectionMaterial.setPredicationThreshold(0.002);
+    smaaEffect.edgeDetectionMaterial.setPredicationScale(1.0);
 
-    const ssaoOptions = {
-      resolutionScale: 0.5,
-      blendFunction: BlendFunction.MULTIPLY,
-      distanceScaling: true,
-      depthAwareUpsampling: true,
-      samples: 20,
-      rings: 7,
-      radius: 0.052,
-      distanceThreshold: 0.97, // Render up to a distance of ~20 world units
-      distanceFalloff: 0.03, // with an additional ~2.5 units of falloff.
-      rangeThreshold: 0.0005, // Occlusion proximity of ~0.3 world units
-      rangeFalloff: 0.001, // with ~0.1 units of falloff.
-      minRadiusScale: 0.33,
-      intensity: 10,
-      bias: 0,
-      fade: 0,
-      luminanceInfluence: 5,
-      color: null,
-    };
-    const ssaoEffect = new SSAOEffect(
-      this.camera,
-      normalPass.texture,
-      ssaoOptions
-    );
-
-    const textureEffect = new TextureEffect({
+    const edgesTextureEffect = new TextureEffect({
       blendFunction: BlendFunction.SKIP,
-      texture: depthDownsamplingPass.texture,
+      texture: smaaEffect.renderTargetEdges.texture,
+    });
+
+    const weightsTextureEffect = new TextureEffect({
+      blendFunction: BlendFunction.SKIP,
+      texture: smaaEffect.renderTargetWeights.texture,
     });
 
     const effectPass = new EffectPass(
       this.camera,
       smaaEffect,
-      ssaoEffect,
-      textureEffect
+      edgesTextureEffect,
+      weightsTextureEffect
     );
 
-    composer.addPass(normalPass);
-
-    if (capabilities.isWebGL2) {
-      composer.addPass(depthDownsamplingPass);
-    } else {
-      console.log(
-        "WebGL 2 not supported, falling back to naive depth downsampling"
-      );
-    }
-
-    const color = new THREE.Color();
-
-    const blendMode = ssaoEffect.blendMode;
-    const uniforms = ssaoEffect.ssaoMaterial.uniforms;
-
-    const RenderMode = {
-      DEFAULT: 0,
-      NORMALS: 1,
-      DEPTH: 2,
-    };
-
-    const params = {
-      distance: {
-        threshold: uniforms.distanceCutoff.value.x,
-        falloff:
-          uniforms.distanceCutoff.value.y - uniforms.distanceCutoff.value.x,
-      },
-      proximity: {
-        threshold: uniforms.proximityCutoff.value.x,
-        falloff:
-          uniforms.proximityCutoff.value.y - uniforms.proximityCutoff.value.x,
-      },
-      upsampling: {
-        enabled: ssaoEffect.defines.has("DEPTH_AWARE_UPSAMPLING"),
-        threshold: Number(ssaoEffect.defines.get("THRESHOLD")),
-      },
-      distanceScaling: {
-        enabled: ssaoEffect.distanceScaling,
-        "min scale": uniforms.minRadiusScale.value,
-      },
-      "lum influence": ssaoEffect.uniforms.get("luminanceInfluence").value,
-      intensity: uniforms.intensity.value,
-      bias: uniforms.bias.value,
-      fade: uniforms.fade.value,
-      "render mode": RenderMode.DEFAULT,
-      resolution: ssaoEffect.resolution.scale,
-      color: 0x000000,
-      opacity: blendMode.opacity.value,
-      "blend mode": blendMode.blendFunction,
-    };
-    function toggleRenderMode() {
-      const mode = Number(params["render mode"]);
-
-      if (mode === RenderMode.DEPTH) {
-        textureEffect.setTextureSwizzleRGBA(ColorChannel.ALPHA);
-      } else if (mode === RenderMode.NORMALS) {
-        textureEffect.setTextureSwizzleRGBA(
-          ColorChannel.RED,
-          ColorChannel.GREEN,
-          ColorChannel.BLUE,
-          ColorChannel.ALPHA
-        );
-      }
-
-      textureEffect.blendMode.setBlendFunction(
-        mode !== RenderMode.DEFAULT ? BlendFunction.NORMAL : BlendFunction.SKIP
-      );
-
-      effectPass.encodeOutput = mode === RenderMode.DEFAULT;
-    }
-
-    const menu = new GUI();
-
-    if (capabilities.isWebGL2) {
-      menu.add(params, "render mode", RenderMode).onChange(toggleRenderMode);
-    }
-
-    menu.add(params, "resolution", 0.25, 1.0, 0.25).onChange((value) => {
-      ssaoEffect.resolution.scale = value;
-      depthDownsamplingPass.resolution.scale = value;
-    });
-
-    menu.add(ssaoEffect, "samples", 1, 32, 1);
-    menu.add(ssaoEffect, "rings", 1, 16, 1);
-    menu.add(ssaoEffect, "radius", 1e-6, 1.0, 0.001);
-
-    let f = menu.addFolder("Distance Scaling");
-
-    f.add(params.distanceScaling, "enabled").onChange((value) => {
-      ssaoEffect.distanceScaling = value;
-    });
-
-    f.add(params.distanceScaling, "min scale", 0.0, 10.0, 0.001).onChange(
-      (value) => {
-        uniforms.minRadiusScale.value = value;
-      }
-    );
-
-    if (capabilities.isWebGL2) {
-      f = menu.addFolder("Depth-Aware Upsampling");
-
-      f.add(params.upsampling, "enabled").onChange((value) => {
-        ssaoEffect.depthAwareUpsampling = value;
-      });
-
-      f.add(params.upsampling, "threshold", 0.0, 10.0, 0.001).onChange(
-        (value) => {
-          // Note: This threshold is not really supposed to be changed.
-          ssaoEffect.defines.set("THRESHOLD", value.toFixed(3));
-          effectPass.recompile();
-        }
-      );
-    }
-
-    f = menu.addFolder("Distance Cutoff");
-
-    f.add(params.distance, "threshold", 0.0, 1.0, 0.0001).onChange((value) => {
-      ssaoEffect.setDistanceCutoff(value, params.distance.falloff);
-    });
-
-    f.add(params.distance, "falloff", 0.0, 1.0, 0.0001).onChange((value) => {
-      ssaoEffect.setDistanceCutoff(params.distance.threshold, value);
-    });
-
-    f = menu.addFolder("Proximity Cutoff");
-
-    f.add(params.proximity, "threshold", 0.0, 1, 0.0001).onChange((value) => {
-      ssaoEffect.setProximityCutoff(value, params.proximity.falloff);
-    });
-
-    f.add(params.proximity, "falloff", 0.0, 1, 0.0001).onChange((value) => {
-      ssaoEffect.setProximityCutoff(params.proximity.threshold, value);
-    });
-
-    menu.add(params, "bias", 0.0, 10, 0.001).onChange((value) => {
-      uniforms.bias.value = value;
-    });
-
-    menu.add(params, "fade", 0.0, 10.0, 0.001).onChange((value) => {
-      uniforms.fade.value = value;
-    });
-
-    menu.add(params, "lum influence", 0.0, 10.0, 0.001).onChange((value) => {
-      ssaoEffect.uniforms.get("luminanceInfluence").value = value;
-    });
-
-    menu.add(params, "intensity", 1.0, 10.0, 0.01).onChange((value) => {
-      uniforms.intensity.value = value;
-    });
-
-    menu.addColor(params, "color").onChange((value) => {
-      ssaoEffect.color =
-        value === 0x000000 ? null : color.setHex(value).convertSRGBToLinear();
-    });
-
-    menu.add(params, "opacity", 0.0, 1.0, 0.001).onChange((value) => {
-      blendMode.opacity.value = value;
-    });
-
-    menu.add(params, "blend mode", BlendFunction).onChange((value) => {
-      blendMode.setBlendFunction(Number(value));
-    });
-
-    if (window.innerWidth < 720) {
-      menu.close();
-    }
-
-    return effectPass;
-  }
-
-  createDOFPass(composer) {
-    const assets = this.load();
-    const smaaEffect = new SMAAEffect(
-      assets["smaa-search"],
-      assets["smaa-area"],
-      SMAAPreset.HIGH,
-      EdgeDetectionMode.DEPTH
-    );
-
-    smaaEffect.edgeDetectionMaterial.setEdgeDetectionThreshold(0.01);
-
-    const depthOfFieldEffect = new DepthOfFieldEffect(this.camera, {
-      focusDistance: 0.0,
-      focalLength: 0.25,
-      bokehScale: 1.0,
-      height: 720,
-    });
-
-    const depthEffect = new DepthEffect({
-      blendFunction: BlendFunction.SKIP,
-    });
-
-    const vignetteEffect = new VignetteEffect({
-      eskil: false,
-      offset: 0.35,
-      darkness: 0.5,
-    });
-
-    const cocTextureEffect = new TextureEffect({
-      blendFunction: BlendFunction.SKIP,
-      texture: depthOfFieldEffect.renderTargetCoC.texture,
-    });
-
-    const effectPass = new EffectPass(
-      this.camera,
-      depthOfFieldEffect,
-      vignetteEffect,
-      cocTextureEffect,
-      depthEffect
-    );
-
-    const smaaPass = new EffectPass(this.camera, smaaEffect);
-
-    this.depthEffect = depthEffect;
-    this.vignetteEffect = vignetteEffect;
-    this.depthOfFieldEffect = depthOfFieldEffect;
-    this.cocTextureEffect = cocTextureEffect;
-
+    this.smaaEffect = smaaEffect;
+    this.edgesTextureEffect = edgesTextureEffect;
+    this.weightsTextureEffect = weightsTextureEffect;
     this.effectPass = effectPass;
-    this.smaaPass = smaaPass;
+
+    composer.multisampling = 4;
 
     composer.addPass(effectPass);
-    composer.addPass(smaaPass);
   }
 
   initializeControls() {
