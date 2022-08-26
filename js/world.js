@@ -238,7 +238,7 @@ class World {
   }
 
   initializeControls() {
-    return new FirstPersonController(this.camera, this.context, 12);
+    return new FirstPersonController(this.camera, this.context, 8);
   }
 
   initializeLights() {

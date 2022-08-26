@@ -15,19 +15,12 @@ export class FirstPersonController {
 
     this.playerX = -13;
     this.playerY = 1;
-    this.playerZ = 150;
+    this.playerZ = -60;
 
     this.radius = 1.5;
 
-    this._euler = new THREE.Euler(0, 0, 0, "YXZ");
-    this._vector = new THREE.Vector3();
-    this._PI_2 = Math.PI / 2;
-    this.minPolarAngle = 0;
-    this.maxPolarAngle = Math.PI;
-    this.pointerSpeed = 1.0;
-
     this.playerCollider = new Capsule(
-      new THREE.Vector3(this.playerX, this.playerY + 0.1, this.playerZ),
+      new THREE.Vector3(this.playerX, this.playerY + 0.25, this.playerZ),
       new THREE.Vector3(this.playerX, this.playerY + 3.0, this.playerZ),
       this.radius
     );
@@ -51,7 +44,7 @@ export class FirstPersonController {
 
     this.document.body.addEventListener("mousemove", (event) => {
       if (this.document.pointerLockElement === this.document.body) {
-        let factor = 1000;
+        let factor = 2000;
         this.camera.rotation.y -= event.movementX / factor;
         this.camera.rotation.x -= event.movementY / factor;
       }
@@ -104,7 +97,7 @@ export class FirstPersonController {
   }
 
   updatePlayer(delta) {
-    let damping = 1.25 * (Math.exp(-4 * delta) - 1);
+    let damping = 1.5 * (Math.exp(-4 * delta) - 1);
     this.velocity.addScaledVector(this.velocity, damping);
 
     const deltaPosition = this.velocity.clone().multiplyScalar(delta);

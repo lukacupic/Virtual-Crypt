@@ -27,9 +27,7 @@ export class LightManager {
   static configurePointLight(pointLight) {
     // small chamber light
     if (this.isWhite(pointLight.color)) {
-      pointLight.intensity = 10;
-      pointLight.distance = 3;
-      pointLight.decay = 2;
+      pointLight.intensity = 25;
 
       // large ceiling light
     } else {
