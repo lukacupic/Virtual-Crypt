@@ -72,7 +72,7 @@ export class FirstPersonController {
 
     this.playerX = -13;
     this.playerY = 1;
-    this.playerZ = -60;
+    this.playerZ = 150;
 
     this.radius = 1.5;
 
@@ -178,19 +178,19 @@ export class FirstPersonController {
   updateControls(delta) {
     const speedDelta = delta * this.speed * 4.0;
 
-    if (this.keyStates["KeyW"]) {
+    if (this.keyStates["KeyW"] || this.keyStates["ArrowUp"]) {
       this.velocity.add(this.getForwardVector().multiplyScalar(speedDelta));
     }
 
-    if (this.keyStates["KeyS"]) {
+    if (this.keyStates["KeyS"] || this.keyStates["ArrowDown"]) {
       this.velocity.add(this.getForwardVector().multiplyScalar(-speedDelta));
     }
 
-    if (this.keyStates["KeyA"]) {
+    if (this.keyStates["KeyA"] || this.keyStates["ArrowLeft"]) {
       this.velocity.add(this.getSideVector().multiplyScalar(-speedDelta));
     }
 
-    if (this.keyStates["KeyD"]) {
+    if (this.keyStates["KeyD"] || this.keyStates["ArrowRight"]) {
       this.velocity.add(this.getSideVector().multiplyScalar(speedDelta));
     }
   }
