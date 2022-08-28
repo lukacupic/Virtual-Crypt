@@ -102,7 +102,7 @@ class World {
     const scene = new THREE.Scene();
 
     scene.background = "#000000";
-    scene.fog = new THREE.Fog(scene.background, 1, 250);
+    scene.fog = new THREE.Fog(scene.background, 1, 190);
 
     const planeGeo = new THREE.PlaneGeometry(500, 500);
     const groundMirror = new Reflector(planeGeo, {
@@ -122,7 +122,7 @@ class World {
     const fov = 60;
     const aspect = window.innerWidth / window.innerHeight;
     const near = 1.0;
-    const far = 300.0;
+    const far = 200.0;
 
     const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
     camera.rotation.order = "YXZ";
@@ -238,7 +238,8 @@ class World {
   }
 
   initializeControls() {
-    return new FirstPersonController(this.camera, this.context, 8);
+    const controls = new FirstPersonController(this.camera, this.context, 8);
+    return controls;
   }
 
   initializeLights() {

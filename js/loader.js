@@ -4,10 +4,6 @@ import { LightManager } from "./lights.js";
 
 import { GLTFLoader } from "https://unpkg.com/three@0.143.0/examples/jsm/loaders/GLTFLoader.js";
 
-class Model {}
-
-class ModelLoader {}
-
 export class Loader {
   constructor(world, anisotropy) {
     this.world = world;
@@ -26,15 +22,15 @@ export class Loader {
     manager.onLoad = () => {
       const loadingScreen = document.getElementById("loading-screen");
       loadingScreen.classList.add("fade-out");
-
       loadingScreen.style.pointerEvents = "none";
     };
 
-    manager.onProgress = (url, itemsLoaded, itemsTotal) => {};
-
-    manager.onError = (url) => {
-      console.log("There was an error loading " + url);
+    manager.onProgress = (url, itemsLoaded, itemsTotal) => {
+      const progressBar = document.getElementById("progress-bar");
+      progressBar.value = (itemsLoaded / itemsTotal) * 100;
     };
+
+    manager.onError = (url) => {};
 
     return manager;
   }
@@ -79,7 +75,7 @@ export class Loader {
           node.material.map.anisotropy = this.anisotropy;
         }
       } else if (node.isLight) {
-        LightManager.configurePointLight(node);
+        LightManager.configureLight(node);
       }
     });
 

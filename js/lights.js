@@ -24,16 +24,18 @@ export class LightManager {
     );
   }
 
-  static configurePointLight(pointLight) {
+  static configureLight(light) {
+    light.shadow.autoUpdate = false;
+
     // small chamber light
-    if (this.isWhite(pointLight.color)) {
-      pointLight.intensity = 25;
+    if (this.isWhite(light.color)) {
+      light.intensity = 25;
 
       // large ceiling light
     } else {
-      pointLight.intensity = 2500;
-      pointLight.distance = 50;
-      pointLight.decay = 2;
+      light.intensity = 2500;
+      light.distance = 50;
+      light.decay = 2;
     }
   }
 

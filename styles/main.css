@@ -1,3 +1,5 @@
+/* Main Start */
+
 body {
   margin: 0;
   overflow: hidden;
@@ -8,6 +10,17 @@ body {
   line-height: 24px;
   overscroll-behavior: none;
 }
+
+a,
+button,
+input,
+select {
+  pointer-events: auto;
+}
+
+/* Main End */
+
+/* Loading Start */
 
 #loading-screen {
   position: absolute;
@@ -68,6 +81,15 @@ body {
   animation: spin 1.5s linear infinite;
 }
 
+#progress-bar {
+  display: block;
+  position: relative;
+  left: 50%;
+  top: 50%;
+  width: 30%;
+  height: 2%;
+}
+
 @-webkit-keyframes spin {
   0% {
     -webkit-transform: rotate(0deg);
@@ -96,12 +118,9 @@ body {
   }
 }
 
-a,
-button,
-input,
-select {
-  pointer-events: auto;
-}
+/* Loading End */
+
+/* Instructions Start */
 
 @media all and (max-width: 640px) {
   .lil-gui.root {
@@ -138,3 +157,5 @@ select {
 #arrows {
   font-size: 2em;
 }
+
+/* Instructions End */
