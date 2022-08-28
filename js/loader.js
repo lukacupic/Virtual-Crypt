@@ -20,14 +20,14 @@ export class Loader {
     manager.onStart = (url, itemsLoaded, itemsTotal) => {};
 
     manager.onLoad = () => {
-      const loadingScreen = document.getElementById("loading-screen");
-      loadingScreen.classList.add("fade-out");
-      loadingScreen.style.pointerEvents = "none";
+      // const loadingScreen = document.getElementById("loading-screen");
+      // loadingScreen.classList.add("fade-out");
+      // loadingScreen.style.pointerEvents = "none";
     };
 
     manager.onProgress = (url, itemsLoaded, itemsTotal) => {
-      const progressBar = document.getElementById("progress-bar");
-      progressBar.value = (itemsLoaded / itemsTotal) * 100;
+      // const progressBar = document.getElementById("progress-bar");
+      // progressBar.value = (itemsLoaded / itemsTotal) * 100;
     };
 
     manager.onError = (url) => {};
