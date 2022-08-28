@@ -238,7 +238,7 @@ class World {
   }
 
   initializeControls() {
-    const controls = new FirstPersonController(this.camera, this.context, 8);
+    const controls = new FirstPersonController(this.camera, 8.0, this.context);
     return controls;
   }
 
@@ -271,10 +271,9 @@ class World {
 
       this.controls.update(delta);
       this.composer.render();
+      this.stats.update();
 
       this.animate();
-
-      this.stats.update();
     });
   }
 }

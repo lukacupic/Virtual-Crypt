@@ -2,9 +2,66 @@ import * as THREE from "three";
 import { Octree } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Octree.js";
 import { Capsule } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Capsule.js";
 
-export class FirstPersonController {
-  constructor(camera, document, speed) {
+class CameraController {
+  constructor(camera, document) {
     this.camera = camera;
+    this.document = document;
+
+    this.cameraTarget = new THREE.Vector3(
+      this.camera.rotation.x,
+      this.camera.rotation.y,
+      0
+    );
+
+    this.cameraRotation = new THREE.Vector3(
+      this.camera.rotation.x,
+      this.camera.rotation.y,
+      0
+    );
+
+    this.document.addEventListener("mousedown", () => {
+      this.document.body.requestPointerLock();
+    });
+
+    this.document.body.addEventListener("mousemove", (event) => {
+      if (this.document.pointerLockElement === this.document.body) {
+        this.updateRotation(event);
+      }
+    });
+  }
+
+  updateRotation(event) {
+    let factor = 3000;
+    this.cameraTarget.x -= event.movementY / factor;
+    this.cameraTarget.y -= event.movementX / factor;
+  }
+
+  updatePosition(playerPosition) {
+    this.camera.position.copy(playerPosition);
+  }
+
+  lerpCamera() {
+    this.cameraRotation.x = this.camera.rotation.x;
+    this.cameraRotation.y = this.camera.rotation.y;
+
+    this.cameraRotation.lerp(this.cameraTarget, 0.1);
+
+    this.camera.rotation.x = this.cameraRotation.x;
+    this.camera.rotation.y = this.cameraRotation.y;
+  }
+
+  getWorldDirection(direction) {
+    this.camera.getWorldDirection(direction);
+  }
+
+  up() {
+    return this.camera.up;
+  }
+}
+
+export class FirstPersonController {
+  constructor(camera, speed, document) {
+    this.cameraController = new CameraController(camera, document);
     this.document = document;
 
     this.velocity = new THREE.Vector3();
@@ -44,9 +101,7 @@ export class FirstPersonController {
 
     this.document.body.addEventListener("mousemove", (event) => {
       if (this.document.pointerLockElement === this.document.body) {
-        let factor = 2000;
-        this.camera.rotation.y -= event.movementX / factor;
-        this.camera.rotation.x -= event.movementY / factor;
+        this.cameraController.updateRotation(event);
       }
     });
 
@@ -80,7 +135,7 @@ export class FirstPersonController {
   }
 
   getForwardVector() {
-    this.camera.getWorldDirection(this.direction);
+    this.cameraController.getWorldDirection(this.direction);
     this.direction.y = 0;
     this.direction.normalize();
 
@@ -88,10 +143,10 @@ export class FirstPersonController {
   }
 
   getSideVector() {
-    this.camera.getWorldDirection(this.direction);
+    this.cameraController.getWorldDirection(this.direction);
     this.direction.y = 0;
     this.direction.normalize();
-    this.direction.cross(this.camera.up);
+    this.direction.cross(this.cameraController.up());
 
     return this.direction;
   }
@@ -105,7 +160,7 @@ export class FirstPersonController {
 
     this.playerCollisions();
 
-    this.camera.position.copy(this.playerCollider.end);
+    this.cameraController.updatePosition(this.playerCollider.end);
   }
 
   playerCollisions() {
@@ -143,5 +198,6 @@ export class FirstPersonController {
   update(delta) {
     this.updateControls(delta);
     this.updatePlayer(delta);
+    this.cameraController.lerpCamera();
   }
 }
