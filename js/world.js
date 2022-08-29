@@ -52,7 +52,7 @@ class World {
     this.composer = this.initializeComposer();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
-    // this.audio = this.initializeAudio();
+    this.audio = this.initializeAudio();
     this.clock = this.initializeClock();
 
     const stats = Stats();
