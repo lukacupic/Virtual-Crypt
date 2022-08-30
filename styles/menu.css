@@ -1,12 +1,12 @@
-.topnav {
+#menu {
   position: absolute;
   right: 0;
   padding: 2.5rem;
-
-  z-index: 1;
+  z-index: 2;
+  pointer-events: auto;
 }
 
-.topnav a {
+#menu a {
   float: right;
   color: #f2f2f2;
   text-align: center;
@@ -15,10 +15,10 @@
   font-size: 1rem;
 }
 
-.topnav a:hover {
+#menu a:hover {
   color: rgb(161, 0, 0);
 }
 
-.topnav a.active {
+#menu a.active {
   text-decoration: underline;
 }

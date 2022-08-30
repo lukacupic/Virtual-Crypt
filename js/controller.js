@@ -6,24 +6,20 @@ class CameraController {
   constructor(camera, document) {
     this.camera = camera;
     this.document = document;
+    this.menu = document.getElementById("menu");
 
-    this.cameraTarget = new THREE.Vector3(
-      this.camera.rotation.x,
-      this.camera.rotation.y,
-      0
-    );
+    this.cameraTarget = new THREE.Vector3();
+    this.cameraRotation = new THREE.Vector3();
 
-    this.cameraRotation = new THREE.Vector3(
-      this.camera.rotation.x,
-      this.camera.rotation.y,
-      0
-    );
+    this.menu.addEventListener("mousedown", (event) => {
+      event.stopPropagation();
+    });
 
     this.document.addEventListener("mousedown", () => {
       this.document.body.requestPointerLock();
     });
 
-    this.document.body.addEventListener("mousemove", (event) => {
+    this.document.addEventListener("mousemove", (event) => {
       if (this.document.pointerLockElement === this.document.body) {
         this.updateRotation(event);
       }
@@ -84,9 +80,6 @@ export class FirstPersonController {
 
     this.keyStates = {};
 
-    this.blocker = this.document.getElementById("blocker");
-    this.instructions = this.document.getElementById("instructions");
-
     this.document.addEventListener("keydown", (event) => {
       this.keyStates[event.code] = true;
     });
@@ -95,42 +88,31 @@ export class FirstPersonController {
       this.keyStates[event.code] = false;
     });
 
-    this.document.addEventListener("mousedown", () => {
-      this.document.body.requestPointerLock();
-    });
-
-    this.document.body.addEventListener("mousemove", (event) => {
-      if (this.document.pointerLockElement === this.document.body) {
-        this.cameraController.updateRotation(event);
-      }
-    });
+    this.blocker = this.document.getElementById("blocker");
+    this.instructions = this.document.getElementById("instructions");
+    this.menu = this.document.getElementById("instructions");
 
     if ("onpointerlockchange" in this.document) {
-      this.document.addEventListener("pointerlockchange", (event) => {
-        if (
-          !!this.document.pointerLockElement ||
-          !!this.document.mozPointerLockElement
-        ) {
-          this.instructions.style.display = "none";
-          this.blocker.style.display = "none";
-        } else {
-          this.blocker.style.display = "block";
-          this.instructions.style.display = "";
-        }
+      this.document.addEventListener("pointerlockchange", () => {
+        this.addPointerLock();
       });
     } else if ("onmozpointerlockchange" in this.document) {
-      this.document.addEventListener("mozpointerlockchange", (event) => {
-        if (
-          !!this.document.pointerLockElement ||
-          !!this.document.mozPointerLockElement
-        ) {
-          this.instructions.style.display = "none";
-          this.blocker.style.display = "none";
-        } else {
-          this.blocker.style.display = "block";
-          this.instructions.style.display = "";
-        }
+      this.document.addEventListener("mozpointerlockchange", () => {
+        this.addPointerLock();
       });
+    }
+  }
+
+  addPointerLock() {
+    if (
+      !!this.document.pointerLockElement ||
+      !!this.document.mozPointerLockElement
+    ) {
+      this.blocker.style.display = "none";
+      this.instructions.style.display = "none";
+    } else {
+      this.blocker.style.display = "block";
+      this.instructions.style.display = "";
     }
   }
 
@@ -168,7 +150,7 @@ export class FirstPersonController {
 
     if (collision) {
       const collisionVector = collision.normal.multiplyScalar(collision.depth);
-      collisionVector.setY(0); // don't allow player to move up or down
+      collisionVector.setY(0);
 
       this.playerCollider.start.add(collisionVector);
       this.playerCollider.end.add(collisionVector);
