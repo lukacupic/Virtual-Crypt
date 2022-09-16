@@ -6,7 +6,7 @@
     <link rel="stylesheet" href="styles/main.css" />
     <link rel="stylesheet" href="styles/loading.css" />
     <link rel="stylesheet" href="styles/instructions.css" />
-    <link rel="stylesheet" href="styles/menu.css" />
+    <link rel="stylesheet" href="styles/intro.css" />
   </head>
 
   <body>
@@ -24,12 +24,6 @@
     <script src="js/world.js" type="module"></script>
 
     <div id="blocker">
-      <div id="menu">
-        <a href="#o-nama">O nama</a>
-        <a href="#postavke">Postavke</a>
-        <a class="active" href="#kripta">Kripta</a>
-      </div>
-
       <div id="instructions">
         <p style="font-size: 3em">Kliknite za početak</p>
         <p>
@@ -41,12 +35,20 @@
       </div>
     </div>
 
+    <video
+      id="video"
+      crossorigin="anonymous"
+      playsinline
+      muted
+      style="display: none"
+    >
+      <source src="/assets/videos/intro.mp4" />
+    </video>
+
     <section id="loading-screen">
-      <div id="title-1">
-        <p>Virtualna kripta</p>
-        <p style="font-size: 1.2rem">Sv. Blaž, Vodnjan</p>
+      <div id="title">
+        <p>SANCTUARIUM ADIGNANI</p>
       </div>
-      <!-- <div id="title-2">Virtualna kripta</div> -->
     </section>
   </body>
 </html>

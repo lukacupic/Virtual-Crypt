@@ -9,43 +9,35 @@
   width: 100%;
   height: 100%;
   background-color: #000000;
-  opacity: 1;
-  transition: opacity 2s;
+  animation: fade-loading-screen 5s;
+  animation-delay: 5s;
+  animation-fill-mode: forwards;
 }
 
-#loading-screen.fade-out {
-  opacity: 0;
-}
-
-#title-1 {
+#title {
   position: absolute;
-  font-size: 1.6rem;
+  font-size: 3rem;
   text-align: center;
 
-  animation: fade-text 5s;
+  animation: fade-intro-text 5s;
   animation-delay: 0s;
   animation-fill-mode: forwards;
 }
 
-#title-1.p:nth-of-type(2) {
-  font-size: 1rem;
-}
-
-#title-2 {
-  position: absolute;
-  font-size: 1.6rem;
-  opacity: 0;
-
-  animation: fade-text 3s;
-  animation-delay: 4s;
-  animation-fill-mode: forwards;
-}
-
-@keyframes fade-text {
+@keyframes fade-intro-text {
   0% {
     opacity: 0;
   }
   50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-loading-screen {
+  0% {
     opacity: 1;
   }
   100% {

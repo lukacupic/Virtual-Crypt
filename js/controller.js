@@ -6,14 +6,9 @@ class CameraController {
   constructor(camera, document) {
     this.camera = camera;
     this.document = document;
-    this.menu = document.getElementById("menu");
 
     this.cameraTarget = new THREE.Vector3();
     this.cameraRotation = new THREE.Vector3();
-
-    this.menu.addEventListener("mousedown", (event) => {
-      event.stopPropagation();
-    });
 
     this.document.addEventListener("mousedown", () => {
       this.document.body.requestPointerLock();
@@ -56,7 +51,7 @@ class CameraController {
 }
 
 export class FirstPersonController {
-  constructor(camera, speed, document) {
+  constructor(position, camera, speed, document) {
     this.cameraController = new CameraController(camera, document);
     this.document = document;
 
@@ -66,9 +61,9 @@ export class FirstPersonController {
 
     this.worldOctree = new Octree();
 
-    this.playerX = -13;
-    this.playerY = 1;
-    this.playerZ = 150;
+    this.playerX = position.x;
+    this.playerY = position.y;
+    this.playerZ = position.z;
 
     this.radius = 1.5;
 
@@ -90,7 +85,6 @@ export class FirstPersonController {
 
     this.blocker = this.document.getElementById("blocker");
     this.instructions = this.document.getElementById("instructions");
-    this.menu = this.document.getElementById("instructions");
 
     if ("onpointerlockchange" in this.document) {
       this.document.addEventListener("pointerlockchange", () => {

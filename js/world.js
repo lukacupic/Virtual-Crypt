@@ -23,6 +23,7 @@ import {
   VignetteEffect,
   CopyMaterial,
   PredicationMode,
+  SelectiveBloomEffect,
 } from "./lib/postprocessing.js";
 
 /* SSR */
@@ -44,6 +45,11 @@ import { Loader } from "./loader.js";
 class World {
   constructor() {
     this.context = document;
+    this.width = window.innerWidth;
+    this.height = window.innerHeight;
+
+    this.introPosition = new THREE.Vector3(-13, 1, -1000);
+    this.controlsPosition = new THREE.Vector3(-13, 1, 150);
 
     this.renderer = this.initializeRenderer();
     this.loader = this.initializeLoader();
@@ -54,6 +60,7 @@ class World {
     this.lights = this.initializeLights();
     this.audio = this.initializeAudio();
     this.clock = this.initializeClock();
+    this.initializeVideo();
 
     const stats = Stats();
     const panels = [0, 1, 2];
@@ -79,7 +86,7 @@ class World {
     });
 
     renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setSize(this.width, this.height);
 
     renderer.physicallyCorrectLights = true;
     renderer.outputEncoding = THREE.sRGBEncoding;
@@ -87,7 +94,7 @@ class World {
     renderer.toneMappingExposure = 0.5;
 
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.shadowMap.type = THREE.BasicShadowMap;
 
     this.context.body.appendChild(renderer.domElement);
 
@@ -120,7 +127,7 @@ class World {
 
   initializeCamera() {
     const fov = 60;
-    const aspect = window.innerWidth / window.innerHeight;
+    const aspect = this.width / this.height;
     const near = 1.0;
     const far = 200.0;
 
@@ -151,7 +158,7 @@ class World {
     const composer = new EffectComposer(this.renderer);
     composer.addPass(new RenderPass(this.scene, this.camera));
 
-    composer.addPass(this.createSSRPass());
+    // composer.addPass(this.createSSRPass());
     this.createAAPass(composer);
 
     return composer;
@@ -238,7 +245,12 @@ class World {
   }
 
   initializeControls() {
-    const controls = new FirstPersonController(this.camera, 8.0, this.context);
+    const controls = new FirstPersonController(
+      this.introPosition,
+      this.camera,
+      8.0,
+      this.context
+    );
     return controls;
   }
 
@@ -257,12 +269,39 @@ class World {
     return new THREE.Clock();
   }
 
+  initializeVideo() {
+    let video = document.getElementById("video");
+    video.play();
+
+    document.getElementById("video").addEventListener("ended", () => {
+      // TODO video is finished, do what needs to be done
+    });
+
+    let videoTexture = new THREE.VideoTexture(video);
+
+    const xsize = 10;
+    const ysize = xsize / (this.width / this.height);
+    const videoGeometry = new THREE.PlaneGeometry(xsize, ysize);
+
+    const videoMaterial = new THREE.MeshLambertMaterial({
+      map: videoTexture,
+    });
+
+    let videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
+
+    videoMesh.position.setX(this.controls.playerX);
+    videoMesh.position.setY(this.controls.playerY + 1.1 * (ysize / 2));
+    videoMesh.position.setZ(this.controls.playerZ - 6);
+
+    this.scene.add(videoMesh);
+  }
+
   onWindowResize() {
-    this.camera.aspect = window.innerWidth / window.innerHeight;
+    this.camera.aspect = this.width / this.height;
     this.camera.updateProjectionMatrix();
 
-    this.renderer.setSize(window.innerWidth, window.innerHeight);
-    this.composer.setSize(window.innerWidth, window.innerHeight);
+    this.renderer.setSize(this.width, this.height);
+    this.composer.setSize(this.width, this.height);
   }
 
   animate() {
@@ -281,7 +320,6 @@ class World {
 async function main() {
   const world = new World();
   await world.loader.loadModels();
-
   world.renderer.compile(world.scene, world.camera);
   world.animate();
 }

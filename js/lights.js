@@ -13,7 +13,7 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new THREE.AmbientLight("#f2e4a2", 0.5);
+    return new THREE.AmbientLight("#f2e4a2", 1);
   }
 
   createHemisphereLight() {

@@ -8,9 +8,7 @@ export class Loader {
   constructor(world, anisotropy) {
     this.world = world;
     this.manager = this.initialize(world.context);
-
     this.gltfLoader = new GLTFLoader(this.manager);
-
     this.anisotropy = anisotropy;
   }
 
@@ -20,14 +18,9 @@ export class Loader {
     manager.onStart = (url, itemsLoaded, itemsTotal) => {};
 
     manager.onLoad = () => {
-      const loadingScreen = document.getElementById("loading-screen");
-      loadingScreen.classList.add("fade-out");
-      loadingScreen.style.pointerEvents = "none";
-    };
-
-    manager.onProgress = (url, itemsLoaded, itemsTotal) => {
-      // const progressBar = document.getElementById("progress-bar");
-      // progressBar.value = (itemsLoaded / itemsTotal) * 100;
+      // const loadingScreen = document.getElementById("loading-screen");
+      // loadingScreen.classList.add("fade-out");
+      // loadingScreen.style.pointerEvents = "none";
     };
 
     manager.onError = (url) => {};
