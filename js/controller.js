@@ -10,15 +10,26 @@ class CameraController {
     this.cameraTarget = new THREE.Vector3();
     this.cameraRotation = new THREE.Vector3();
 
+    this.canMove = false;
+
     this.document.addEventListener("mousedown", () => {
-      this.document.body.requestPointerLock();
+      if (this.canMove) {
+        this.document.body.requestPointerLock();
+      }
     });
 
     this.document.addEventListener("mousemove", (event) => {
-      if (this.document.pointerLockElement === this.document.body) {
+      if (
+        this.canMove &&
+        this.document.pointerLockElement === this.document.body
+      ) {
         this.updateRotation(event);
       }
     });
+  }
+
+  enableMovement(boolean) {
+    this.canMove = boolean;
   }
 
   updateRotation(event) {
@@ -51,7 +62,7 @@ class CameraController {
 }
 
 export class FirstPersonController {
-  constructor(position, camera, speed, document) {
+  constructor(camera, document, speed) {
     this.cameraController = new CameraController(camera, document);
     this.document = document;
 
@@ -61,26 +72,27 @@ export class FirstPersonController {
 
     this.worldOctree = new Octree();
 
-    this.playerX = position.x;
-    this.playerY = position.y;
-    this.playerZ = position.z;
-
     this.radius = 1.5;
 
-    this.playerCollider = new Capsule(
-      new THREE.Vector3(this.playerX, this.playerY + 0.25, this.playerZ),
-      new THREE.Vector3(this.playerX, this.playerY + 3.0, this.playerZ),
-      this.radius
-    );
+    this.introPosition = new THREE.Vector3(-13, 1, -1000);
+    this.controlsPosition = new THREE.Vector3(-13, 1, 150);
+
+    this.setIntroPosition();
 
     this.keyStates = {};
 
+    this.canMove = false;
+
     this.document.addEventListener("keydown", (event) => {
-      this.keyStates[event.code] = true;
+      if (this.canMove) {
+        this.keyStates[event.code] = true;
+      }
     });
 
     this.document.addEventListener("keyup", (event) => {
-      this.keyStates[event.code] = false;
+      if (this.canMove) {
+        this.keyStates[event.code] = false;
+      }
     });
 
     this.blocker = this.document.getElementById("blocker");
@@ -95,6 +107,29 @@ export class FirstPersonController {
         this.addPointerLock();
       });
     }
+  }
+
+  enableMovement(boolean) {
+    this.canMove = boolean;
+    this.cameraController.enableMovement(boolean);
+  }
+
+  setIntroPosition() {
+    this.setPosition(this.introPosition);
+  }
+
+  setControlsPosition() {
+    this.setPosition(this.controlsPosition);
+  }
+
+  setPosition(position) {
+    this.playerCollider = new Capsule(
+      new THREE.Vector3(position.x, position.y + 0.25, position.z),
+      new THREE.Vector3(position.x, position.y + 3.0, position.z),
+      this.radius
+    );
+
+    this.position = position;
   }
 
   addPointerLock() {

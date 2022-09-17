@@ -41,15 +41,13 @@ import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
 import { AudioManager } from "./audio.js";
 import { Loader } from "./loader.js";
+import { VideoManager } from "./video.js";
 
 class World {
   constructor() {
     this.context = document;
     this.width = window.innerWidth;
     this.height = window.innerHeight;
-
-    this.introPosition = new THREE.Vector3(-13, 1, -1000);
-    this.controlsPosition = new THREE.Vector3(-13, 1, 150);
 
     this.renderer = this.initializeRenderer();
     this.loader = this.initializeLoader();
@@ -59,8 +57,8 @@ class World {
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
     this.audio = this.initializeAudio();
+    this.video = this.initializeVideo();
     this.clock = this.initializeClock();
-    this.initializeVideo();
 
     const stats = Stats();
     const panels = [0, 1, 2];
@@ -245,13 +243,7 @@ class World {
   }
 
   initializeControls() {
-    const controls = new FirstPersonController(
-      this.introPosition,
-      this.camera,
-      8.0,
-      this.context
-    );
-    return controls;
+    return new FirstPersonController(this.camera, this.context, 8.0);
   }
 
   initializeLights() {
@@ -270,30 +262,16 @@ class World {
   }
 
   initializeVideo() {
-    let video = document.getElementById("video");
-    video.play();
+    const videoManager = new VideoManager(
+      this.scene,
+      this.controls,
+      this.width,
+      this.height,
+      this.context
+    );
+    videoManager.play();
 
-    document.getElementById("video").addEventListener("ended", () => {
-      // TODO video is finished, do what needs to be done
-    });
-
-    let videoTexture = new THREE.VideoTexture(video);
-
-    const xsize = 10;
-    const ysize = xsize / (this.width / this.height);
-    const videoGeometry = new THREE.PlaneGeometry(xsize, ysize);
-
-    const videoMaterial = new THREE.MeshLambertMaterial({
-      map: videoTexture,
-    });
-
-    let videoMesh = new THREE.Mesh(videoGeometry, videoMaterial);
-
-    videoMesh.position.setX(this.controls.playerX);
-    videoMesh.position.setY(this.controls.playerY + 1.1 * (ysize / 2));
-    videoMesh.position.setZ(this.controls.playerZ - 6);
-
-    this.scene.add(videoMesh);
+    return videoManager;
   }
 
   onWindowResize() {
