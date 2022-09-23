@@ -36,6 +36,8 @@ import { GUI } from "./lib/dat.gui.js";
 import { Reflector } from "https://unpkg.com/three@0.143.0/examples/jsm/objects/Reflector.js";
 import Stats from "https://unpkg.com/three@0.143.0/examples/jsm/libs/stats.module";
 
+import { CSS2DRenderer, CSS2DObject } from "./lib/CSS2DRenderer.js";
+
 /* Custom */
 import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
@@ -50,6 +52,7 @@ class World {
     this.height = window.innerHeight;
 
     this.renderer = this.initializeRenderer();
+    this.textRenderer = this.initializeTextRenderer();
     this.loader = this.initializeLoader();
     this.scene = this.initializeScene();
     this.camera = this.initializeCamera();
@@ -97,6 +100,17 @@ class World {
     this.context.body.appendChild(renderer.domElement);
 
     return renderer;
+  }
+
+  initializeTextRenderer() {
+    const textRenderer = new CSS2DRenderer();
+
+    textRenderer.setSize(this.width, this.height);
+    textRenderer.domElement.style.position = "absolute";
+    textRenderer.domElement.style.top = "0px";
+    this.context.body.appendChild(textRenderer.domElement);
+
+    return textRenderer;
   }
 
   initializeLoader() {
@@ -243,7 +257,12 @@ class World {
   }
 
   initializeControls() {
-    return new FirstPersonController(this.camera, this.context, 8.0);
+    return new FirstPersonController(
+      this.camera,
+      this.context,
+      this.loader,
+      8.0
+    );
   }
 
   initializeLights() {
@@ -280,6 +299,7 @@ class World {
 
     this.renderer.setSize(this.width, this.height);
     this.composer.setSize(this.width, this.height);
+    this.textRenderer.setSize(this.width, this.height);
   }
 
   animate() {
@@ -288,6 +308,7 @@ class World {
 
       this.controls.update(delta);
       this.composer.render();
+      this.textRenderer.render(this.scene, this.camera);
       this.stats.update();
 
       this.animate();

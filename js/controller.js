@@ -1,6 +1,7 @@
 import * as THREE from "three";
 import { Octree } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Octree.js";
 import { Capsule } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Capsule.js";
+import { CSS2DRenderer, CSS2DObject } from "./lib/CSS2DRenderer.js";
 
 class CameraController {
   constructor(camera, document) {
@@ -62,8 +63,9 @@ class CameraController {
 }
 
 export class FirstPersonController {
-  constructor(camera, document, speed) {
+  constructor(camera, document, loader, speed) {
     this.cameraController = new CameraController(camera, document);
+    this.loader = loader;
     this.document = document;
 
     this.velocity = new THREE.Vector3();
@@ -75,13 +77,15 @@ export class FirstPersonController {
     this.radius = 1.5;
 
     this.introPosition = new THREE.Vector3(-13, 1, -1000);
-    this.controlsPosition = new THREE.Vector3(-13, 1, 150);
+    this.controlsPosition = new THREE.Vector3(-13, 1, -70);
 
     this.setIntroPosition();
 
     this.keyStates = {};
 
     this.canMove = false;
+
+    this.saintNearby = null;
 
     this.document.addEventListener("keydown", (event) => {
       if (this.canMove) {
@@ -107,6 +111,28 @@ export class FirstPersonController {
         this.addPointerLock();
       });
     }
+  }
+
+  checkDistanceToSaints() {
+    let player = this.playerCollider.end;
+
+    let saints = this.loader.getSaints();
+    if (saints == null) return;
+
+    const infoElement = this.document.getElementById("info");
+
+    for (const saint of saints.values()) {
+      let distance = player.distanceTo(saint.worldPosition);
+      if (distance < 5) {
+        infoElement.style.display = "block";
+        this.saintNearby = saint;
+
+        return;
+      }
+    }
+
+    infoElement.style.display = "none";
+    this.saintNearby = null;
   }
 
   enableMovement(boolean) {
@@ -204,11 +230,24 @@ export class FirstPersonController {
     if (this.keyStates["KeyD"] || this.keyStates["ArrowRight"]) {
       this.velocity.add(this.getSideVector().multiplyScalar(speedDelta));
     }
+
+    if (this.keyStates["KeyI"] && this.saintNearby) {
+      const earthDiv = document.createElement("div");
+      earthDiv.className = "label";
+      earthDiv.textContent = this.saintNearby.infoText;
+      earthDiv.style.marginTop = "-1em";
+
+      const earthLabel = new CSS2DObject(earthDiv);
+      earthLabel.position.set(0, 1, 0);
+      this.saintNearby.add(earthLabel);
+      earthLabel.layers.set(0);
+    }
   }
 
   update(delta) {
     this.updateControls(delta);
     this.updatePlayer(delta);
+    this.checkDistanceToSaints();
     this.cameraController.lerpCamera();
   }
 }

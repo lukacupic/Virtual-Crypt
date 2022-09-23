@@ -13,6 +13,7 @@ export class VideoManager {
     });
 
     this.initialize();
+    this.videoEndListener();
   }
 
   initialize() {

@@ -1,0 +1,26 @@
+#info {
+  display: flex;
+  position: absolute;
+  right: 6em;
+  bottom: 2em;
+  display: none;
+}
+
+#info.span {
+  display: block;
+  font-size: 3em;
+}
+
+#info.span.span {
+  font-size: 10em;
+}
+
+.info-main {
+  color: #ffffff;
+  font-size: 2em;
+}
+
+.info-accent {
+  color: #aa0000;
+  font-size: 2em;
+}
