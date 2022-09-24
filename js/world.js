@@ -44,6 +44,7 @@ import { LightManager } from "./lights.js";
 import { AudioManager } from "./audio.js";
 import { Loader } from "./loader.js";
 import { VideoManager } from "./video.js";
+import { SaintManager } from "./saints.js";
 
 class World {
   constructor() {
@@ -53,6 +54,7 @@ class World {
 
     this.renderer = this.initializeRenderer();
     this.textRenderer = this.initializeTextRenderer();
+    this.saintManager = this.initializeSaintManager();
     this.loader = this.initializeLoader();
     this.scene = this.initializeScene();
     this.camera = this.initializeCamera();
@@ -113,8 +115,16 @@ class World {
     return textRenderer;
   }
 
+  initializeSaintManager() {
+    return new SaintManager(this.context);
+  }
+
   initializeLoader() {
-    return new Loader(this, this.renderer.capabilities.getMaxAnisotropy());
+    return new Loader(
+      this,
+      this.saintManager,
+      this.renderer.capabilities.getMaxAnisotropy()
+    );
   }
 
   initializeScene() {
@@ -261,6 +271,7 @@ class World {
       this.camera,
       this.context,
       this.loader,
+      this.saintManager,
       8.0
     );
   }

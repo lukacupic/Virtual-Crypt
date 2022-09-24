@@ -1,7 +1,6 @@
 import * as THREE from "three";
 import { Octree } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Octree.js";
 import { Capsule } from "https://unpkg.com/three@0.143.0/examples/jsm/math/Capsule.js";
-import { CSS2DRenderer, CSS2DObject } from "./lib/CSS2DRenderer.js";
 
 class CameraController {
   constructor(camera, document) {
@@ -63,9 +62,10 @@ class CameraController {
 }
 
 export class FirstPersonController {
-  constructor(camera, document, loader, speed) {
+  constructor(camera, document, loader, saintManager, speed) {
     this.cameraController = new CameraController(camera, document);
     this.loader = loader;
+    this.saintManager = saintManager;
     this.document = document;
 
     this.velocity = new THREE.Vector3();
@@ -84,8 +84,6 @@ export class FirstPersonController {
     this.keyStates = {};
 
     this.canMove = false;
-
-    this.saintNearby = null;
 
     this.document.addEventListener("keydown", (event) => {
       if (this.canMove) {
@@ -111,28 +109,6 @@ export class FirstPersonController {
         this.addPointerLock();
       });
     }
-  }
-
-  checkDistanceToSaints() {
-    let player = this.playerCollider.end;
-
-    let saints = this.loader.getSaints();
-    if (saints == null) return;
-
-    const infoElement = this.document.getElementById("info");
-
-    for (const saint of saints.values()) {
-      let distance = player.distanceTo(saint.worldPosition);
-      if (distance < 5) {
-        infoElement.style.display = "block";
-        this.saintNearby = saint;
-
-        return;
-      }
-    }
-
-    infoElement.style.display = "none";
-    this.saintNearby = null;
   }
 
   enableMovement(boolean) {
@@ -214,40 +190,41 @@ export class FirstPersonController {
 
   updateControls(delta) {
     const speedDelta = delta * this.speed * 4.0;
+    let moved = false;
 
     if (this.keyStates["KeyW"] || this.keyStates["ArrowUp"]) {
       this.velocity.add(this.getForwardVector().multiplyScalar(speedDelta));
+      moved = true;
     }
 
     if (this.keyStates["KeyS"] || this.keyStates["ArrowDown"]) {
       this.velocity.add(this.getForwardVector().multiplyScalar(-speedDelta));
+      moved = true;
     }
 
     if (this.keyStates["KeyA"] || this.keyStates["ArrowLeft"]) {
       this.velocity.add(this.getSideVector().multiplyScalar(-speedDelta));
+      moved = true;
     }
 
     if (this.keyStates["KeyD"] || this.keyStates["ArrowRight"]) {
       this.velocity.add(this.getSideVector().multiplyScalar(speedDelta));
+      moved = true;
     }
 
-    if (this.keyStates["KeyI"] && this.saintNearby) {
-      const earthDiv = document.createElement("div");
-      earthDiv.className = "label";
-      earthDiv.textContent = this.saintNearby.infoText;
-      earthDiv.style.marginTop = "-1em";
+    if (moved) {
+      let player = this.playerCollider.end;
+      this.saintManager.checkDistanceToSaints(player);
+    }
 
-      const earthLabel = new CSS2DObject(earthDiv);
-      earthLabel.position.set(0, 1, 0);
-      this.saintNearby.add(earthLabel);
-      earthLabel.layers.set(0);
+    if (this.keyStates["KeyI"] && this.saintManager.getSaintNearby()) {
+      this.saintManager.displayText();
     }
   }
 
   update(delta) {
     this.updateControls(delta);
     this.updatePlayer(delta);
-    this.checkDistanceToSaints();
     this.cameraController.lerpCamera();
   }
 }
