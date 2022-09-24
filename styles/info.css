@@ -2,7 +2,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  visibility: hidden;
+  visibility: visible;
 }
 
 #info-main {
@@ -14,6 +14,7 @@
   font-size: 2em;
   line-height: 1.2em;
   text-justify: auto;
+  text-align: center;
   cursor: pointer;
 }
 

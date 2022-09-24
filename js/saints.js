@@ -1,11 +1,11 @@
 import * as THREE from "three";
-import { CSS2DRenderer, CSS2DObject } from "./lib/CSS2DRenderer.js";
 
 export class SaintManager {
   constructor(context) {
     this.context = context;
     this.saints = new Map();
-    this.saintNearby = null;
+    this.saintNearby;
+    this.saintsInfo;
     this.infoElement = context.getElementById("info");
     this.infoElementMain = context.getElementById("info-main");
   }
@@ -14,10 +14,9 @@ export class SaintManager {
     let name = mesh.name;
 
     if (name.includes("Paulus")) {
-      mesh.infoText =
-        "Sveti Pavao nadbiskup Carigradski (+350.) rođen je u Solunu. Tajnik je nadbiskupa u Carigradu. Teolog je na Nicejskom koncilu 325. Proganjan i ubijen 350. Tijelo mu je 391. godine preneseno u katedralu Svete Sofije koja je preimenovana u katedralu svetog Pavla mučenika.";
+      mesh.infoText = "saintrr";
     } else {
-      mesh.infoText = "Test " + name;
+      mesh.infoText = "pdsapdapsdpsadspa";
     }
 
     this.saints.set(name, mesh);
@@ -28,7 +27,6 @@ export class SaintManager {
   }
 
   checkDistanceToSaints(player) {
-    console.log("kikiki");
     let saints = this.saints;
     if (saints == null) return;
 
