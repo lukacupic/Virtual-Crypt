@@ -27,9 +27,10 @@ export class LightManager {
   static configureLight(light) {
     light.shadow.autoUpdate = false;
 
-    // small chamber light
+    // chamber light
+    console.log(light.color);
     if (this.isWhite(light.color)) {
-      light.intensity = 25;
+      light.intensity = 10;
 
       // large ceiling light
     } else {

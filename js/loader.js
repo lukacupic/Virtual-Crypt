@@ -72,6 +72,7 @@ export class Loader {
         }
 
         if (this.saintManager.isSaint(object)) {
+          object.material.lightMapIntensity = 10;
           this.saintManager.saveToSaints(object);
         }
       } else if (object.isLight) {
