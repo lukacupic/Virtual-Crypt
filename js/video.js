@@ -13,7 +13,7 @@ export class VideoManager {
     });
 
     this.initialize();
-    this.videoEndListener();
+    // this.videoEndListener();
   }
 
   initialize() {
@@ -39,16 +39,35 @@ export class VideoManager {
   }
 
   videoEndListener() {
-    // show the instructions text
-    document.getElementById("blocker").style.display = "block";
+    // show first text after video
+    const titleNext = document.getElementById("title-next");
+    titleNext.style.animation = "none";
+    window.requestAnimationFrame(() => {
+      titleNext.style.animation = "fade-intro-text-long 20s";
+      titleNext.style.animationDelay = "0s";
+      titleNext.style.animationFillMode = "forwards";
+    });
 
-    // restart the fade-in animation
+    // show second text after video
+    const titleNextNext = document.getElementById("title-next-next");
+    titleNextNext.style.animation = "none";
+    window.requestAnimationFrame(() => {
+      titleNextNext.style.animation = "fade-intro-text-long 20s";
+      titleNextNext.style.animationDelay = "20s";
+      titleNextNext.style.animationFillMode = "forwards";
+    });
+
+    // remove the loading screen
     const loadingScreen = document.getElementById("loading-screen");
     loadingScreen.style.animation = "none";
     window.requestAnimationFrame(() => {
       loadingScreen.style.animation = "fade-loading-screen 5s";
+      loadingScreen.style.animationDelay = "42s";
       loadingScreen.style.animationFillMode = "forwards";
     });
+
+    // show the instructions text
+    document.getElementById("blocker").style.display = "block";
 
     // enable controls
     this.controls.setControlsPosition();

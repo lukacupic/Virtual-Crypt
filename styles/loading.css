@@ -24,11 +24,48 @@
   animation-fill-mode: forwards;
 }
 
+#title-next {
+  position: absolute;
+  width: 80%;
+  font-size: 2em;
+  line-height: 1.2em;
+  text-justify: inter-word;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0;
+}
+
+#title-next-next {
+  position: absolute;
+  width: 80%;
+  font-size: 2em;
+  line-height: 1.2em;
+  text-justify: inter-word;
+  text-align: left;
+  cursor: pointer;
+  opacity: 0;
+}
+
 @keyframes fade-intro-text {
   0% {
     opacity: 0;
   }
   50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes fade-intro-text-long {
+  0% {
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
     opacity: 1;
   }
   100% {
