@@ -2,7 +2,7 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  visibility: visible;
+  visibility: hidden;
 }
 
 #info-main {
@@ -11,10 +11,10 @@
   left: 50%;
   width: 80%;
   transform: translate(-50%, -50%);
-  font-size: 2em;
+  font-size: 1.5em;
   line-height: 1.2em;
-  text-justify: auto;
-  text-align: center;
+  text-justify: inter-word;
+  text-align: left;
   cursor: pointer;
 }
 
