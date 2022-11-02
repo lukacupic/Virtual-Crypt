@@ -13,14 +13,14 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new THREE.AmbientLight("#f2e4a2", 1);
+    return new THREE.AmbientLight("#f2e4a2", 0.25);
   }
 
   createHemisphereLight() {
     return new THREE.HemisphereLight(
       "#f2e4a2", // ceiling color
       "#3b3b3b", // ground color
-      0.5
+      0.25
     );
   }
 
@@ -28,9 +28,8 @@ export class LightManager {
     light.shadow.autoUpdate = false;
 
     // chamber light
-    console.log(light.color);
     if (this.isWhite(light.color)) {
-      light.intensity = 10;
+      light.intensity = 20;
 
       // large ceiling light
     } else {

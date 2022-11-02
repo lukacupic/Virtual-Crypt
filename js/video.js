@@ -9,11 +9,10 @@ export class VideoManager {
 
     this.video = document.getElementById("video");
     this.video.addEventListener("ended", () => {
-      // this.videoEndListener();
+      this.videoEndListener();
     });
 
     this.initialize();
-    this.testtt();
   }
 
   initialize() {
@@ -43,7 +42,7 @@ export class VideoManager {
     const titleNext = document.getElementById("title-next");
     titleNext.style.animation = "none";
     window.requestAnimationFrame(() => {
-      titleNext.style.animation = "fade-intro-text-long 20s";
+      titleNext.style.animation = "fade-intro-text-long 30s";
       titleNext.style.animationDelay = "0s";
       titleNext.style.animationFillMode = "forwards";
     });
@@ -52,8 +51,8 @@ export class VideoManager {
     const titleNextNext = document.getElementById("title-next-next");
     titleNextNext.style.animation = "none";
     window.requestAnimationFrame(() => {
-      titleNextNext.style.animation = "fade-intro-text-long 20s";
-      titleNextNext.style.animationDelay = "20s";
+      titleNextNext.style.animation = "fade-intro-text-long 30s";
+      titleNextNext.style.animationDelay = "31s";
       titleNextNext.style.animationFillMode = "forwards";
     });
 
@@ -62,7 +61,7 @@ export class VideoManager {
     loadingScreen.style.animation = "none";
     window.requestAnimationFrame(() => {
       loadingScreen.style.animation = "fade-loading-screen 5s";
-      loadingScreen.style.animationDelay = "42s";
+      loadingScreen.style.animationDelay = "62s";
       loadingScreen.style.animationFillMode = "forwards";
     });
 

@@ -16,7 +16,7 @@
 
 #title {
   position: absolute;
-  font-size: 3rem;
+  font-size: 4rem;
   text-align: center;
 
   animation: fade-intro-text 5s;
@@ -27,7 +27,7 @@
 #title-next {
   position: absolute;
   width: 80%;
-  font-size: 2em;
+  font-size: 2.5em;
   line-height: 1.2em;
   text-justify: inter-word;
   text-align: left;
@@ -38,7 +38,7 @@
 #title-next-next {
   position: absolute;
   width: 80%;
-  font-size: 2em;
+  font-size: 2.5em;
   line-height: 1.2em;
   text-justify: inter-word;
   text-align: left;
