@@ -30,7 +30,7 @@ export class Loader {
   }
 
   async loadModels() {
-    // this.loadPhysicalModel("/assets/models/glassc.glb", [], [], 0.4);
+    this.loadPhysicalModel("/assets/models/walls.glb", [], [], 0.4);
     this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
   }
 
