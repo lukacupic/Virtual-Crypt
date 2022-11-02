@@ -2,13 +2,11 @@
 .cache
 .DS_Store
 src/.temp
-assets/
 node_modules
 dist
 .env
 .env.*
 .vscode
-*.glb
 *.blend
 *.blend1
 *.ogg
