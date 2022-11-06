@@ -13,14 +13,14 @@ export class LightManager {
   }
 
   createAmbientLight() {
-    return new THREE.AmbientLight("#f2e4a2", 0.25);
+    return new THREE.AmbientLight("#f2e4a2", 1.0);
   }
 
   createHemisphereLight() {
     return new THREE.HemisphereLight(
       "#f2e4a2", // ceiling color
       "#3b3b3b", // ground color
-      0.25
+      1.0
     );
   }
 

@@ -1,36 +1,17 @@
 import * as THREE from "three";
 
 import { LightManager } from "./lights.js";
-
 import { GLTFLoader } from "./lib/GLTFLoader.js";
 
 export class Loader {
-  constructor(world, saintManager, anisotropy) {
+  constructor(world, anisotropy) {
     this.world = world;
-    this.loadingManager = this.initialize(world.context);
-    this.saintManager = saintManager;
     this.gltfLoader = new GLTFLoader(this.loadingManager);
     this.anisotropy = anisotropy;
   }
 
-  initialize(document) {
-    const loadingManager = new THREE.LoadingManager();
-
-    loadingManager.onStart = (url, itemsLoaded, itemsTotal) => {};
-
-    loadingManager.onLoad = () => {
-      // const loadingScreen = document.getElementById("loading-screen");
-      // loadingScreen.classList.add("fade-out");
-      // loadingScreen.style.pointerEvents = "none";
-    };
-
-    loadingManager.onError = (url) => {};
-
-    return loadingManager;
-  }
-
   async loadModels() {
-    this.loadPhysicalModel("/assets/models/walls.glb", [], [], 0.4);
+    // this.loadPhysicalModel("/assets/models/world.glb", [], [], 0.4);
     this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
   }
 
@@ -69,11 +50,6 @@ export class Loader {
 
         if (object.material.map) {
           object.material.map.anisotropy = this.anisotropy;
-        }
-
-        if (this.saintManager.isSaint(object)) {
-          object.material.lightMapIntensity = 10;
-          this.saintManager.saveToSaints(object);
         }
       } else if (object.isLight) {
         LightManager.configureLight(object);
