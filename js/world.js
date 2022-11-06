@@ -69,19 +69,19 @@ class World {
   initializeScene() {
     const scene = new THREE.Scene();
 
-    // scene.background = "#000000";
-    // scene.fog = new THREE.Fog(scene.background, 1, 190);
+    scene.background = "#000000";
+    scene.fog = new THREE.Fog(scene.background, 1, 190);
 
-    // const planeGeo = new THREE.PlaneGeometry(500, 500);
-    // const groundMirror = new Reflector(planeGeo, {
-    //   clipBias: 0.0003,
-    //   textureWidth: 1024,
-    //   textureHeight: 1024,
-    //   color: "#292929",
-    // });
-    // groundMirror.rotateX(-Math.PI / 2);
-    // groundMirror.opacity = 0.2;
-    // scene.add(groundMirror);
+    const planeGeo = new THREE.PlaneGeometry(500, 500);
+    const groundMirror = new Reflector(planeGeo, {
+      clipBias: 0.0003,
+      textureWidth: 1024,
+      textureHeight: 1024,
+      color: "#292929",
+    });
+    groundMirror.rotateX(-Math.PI / 2);
+    groundMirror.opacity = 0.2;
+    scene.add(groundMirror);
 
     return scene;
   }
