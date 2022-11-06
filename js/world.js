@@ -41,7 +41,7 @@ class World {
     });
 
     // --- FPS CAP FOR PERFORMANCE. TEMPORARY ---
-    this.fps = 60;
+    this.fps = 30;
     this.fpsInterval = 1000 / this.fps;
     this.then = window.performance.now();
     this.startTime = this.then;
@@ -49,7 +49,7 @@ class World {
 
   initializeRenderer() {
     const renderer = new THREE.WebGLRenderer({
-      antialias: false,
+      antialias: true,
     });
 
     renderer.setPixelRatio(window.devicePixelRatio);
