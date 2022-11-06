@@ -39,6 +39,12 @@ class World {
     window.addEventListener("resize", () => {
       this.onWindowResize();
     });
+
+    // --- FPS CAP FOR PERFORMANCE. TEMPORARY ---
+    this.fps = 60;
+    this.fpsInterval = 1000 / this.fps;
+    this.then = window.performance.now();
+    this.startTime = this.then;
   }
 
   initializeRenderer() {
@@ -122,15 +128,20 @@ class World {
     this.renderer.setSize(this.width, this.height);
   }
 
+  // --- FPS CAP FOR PERFORMANCE. TEMPORARY ---
   animate() {
     requestAnimationFrame((t) => {
-      const delta = this.clock.getDelta();
+      this.now = t;
+      this.elapsed = this.now - this.then;
 
-      this.controls.update(delta);
-      this.renderer.render(this.scene, this.camera);
-      this.stats.update();
+      if (this.elapsed > this.fpsInterval) {
+        this.then = this.now - (this.elapsed % this.fpsInterval);
 
-      console.log(this.renderer.info.render.calls);
+        const delta = this.clock.getDelta();
+        this.controls.update(delta);
+        this.renderer.render(this.scene, this.camera);
+        this.stats.update();
+      }
 
       this.animate();
     });
