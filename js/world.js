@@ -5,7 +5,7 @@ import * as THREE from "three";
 import { Reflector } from "https://unpkg.com/three@0.143.0/examples/jsm/objects/Reflector.js";
 import Stats from "https://unpkg.com/three@0.143.0/examples/jsm/libs/stats.module";
 
-import { CSS2DRenderer, CSS2DObject } from "./lib/CSS2DRenderer.js";
+import { CSS2DRenderer } from "./lib/CSS2DRenderer.js";
 
 /* Custom */
 import { FirstPersonController } from "./controller.js";

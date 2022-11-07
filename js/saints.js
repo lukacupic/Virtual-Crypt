@@ -46,7 +46,7 @@ export class SaintManager {
 
     for (const saint of saints.values()) {
       let distance = player.distanceTo(saint.worldPosition);
-      if (distance < 5) {
+      if (distance < 8) {
         this.infoElement.style.visibility = "visible";
         this.infoElementMain.style.visibility = "visible";
         this.saintNearby = saint;
