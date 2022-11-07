@@ -62,9 +62,10 @@ class CameraController {
 }
 
 export class FirstPersonController {
-  constructor(camera, document, loader, speed) {
+  constructor(camera, document, loader, saintManager, speed) {
     this.cameraController = new CameraController(camera, document);
     this.loader = loader;
+    this.saintManager = saintManager;
     this.document = document;
 
     this.velocity = new THREE.Vector3();
@@ -209,6 +210,15 @@ export class FirstPersonController {
     if (this.keyStates["KeyD"] || this.keyStates["ArrowRight"]) {
       this.velocity.add(this.getSideVector().multiplyScalar(speedDelta));
       moved = true;
+    }
+
+    if (moved) {
+      let player = this.playerCollider.end;
+      this.saintManager.checkDistanceToSaints(player);
+    }
+
+    if (this.keyStates["KeyI"] && this.saintManager.getSaintNearby()) {
+      this.saintManager.displayText();
     }
   }
 

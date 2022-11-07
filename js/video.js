@@ -9,15 +9,10 @@ export class VideoManager {
 
     this.video = document.getElementById("video");
     this.video.addEventListener("ended", () => {
-      // this.videoEndListener();
+      this.videoEndListener();
     });
 
-    // this.initialize();
-
-    // intro bypass
-    document.getElementById("blocker").style.display = "block";
-    this.controls.setControlsPosition();
-    this.controls.enableMovement(true);
+    this.initialize();
   }
 
   initialize() {
@@ -67,22 +62,6 @@ export class VideoManager {
     window.requestAnimationFrame(() => {
       loadingScreen.style.animation = "fade-loading-screen 5s";
       loadingScreen.style.animationDelay = "62s";
-      loadingScreen.style.animationFillMode = "forwards";
-    });
-
-    // show the instructions text
-    document.getElementById("blocker").style.display = "block";
-
-    // enable controls
-    this.controls.setControlsPosition();
-    this.controls.enableMovement(true);
-  }
-
-  testtt() {
-    const loadingScreen = document.getElementById("loading-screen");
-    loadingScreen.style.animation = "none";
-    window.requestAnimationFrame(() => {
-      loadingScreen.style.animation = "fade-loading-screen 5s";
       loadingScreen.style.animationFillMode = "forwards";
     });
 

@@ -5,7 +5,8 @@ import * as THREE from "three";
 import { Reflector } from "https://unpkg.com/three@0.143.0/examples/jsm/objects/Reflector.js";
 import Stats from "https://unpkg.com/three@0.143.0/examples/jsm/libs/stats.module";
 
-/* Custom */
+import { CSS2DRenderer, CSS2DObject } from "./lib/CSS2DRenderer.js";
+
 /* Custom */
 import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
@@ -23,16 +24,16 @@ class World {
     this.height = window.innerHeight;
 
     this.renderer = this.initializeRenderer();
+    this.textRenderer = this.initializeTextRenderer();
+    this.saintManager = this.initializeSaintManager();
     this.loader = this.initializeLoader();
     this.scene = this.initializeScene();
     this.camera = this.initializeCamera();
     this.controls = this.initializeControls();
     this.lights = this.initializeLights();
+    this.audio = this.initializeAudio();
+    this.video = this.initializeVideo();
     this.clock = this.initializeClock();
-
-    document.getElementById("blocker").style.display = "block";
-    this.controls.setControlsPosition();
-    this.controls.enableMovement(true);
 
     const stats = Stats();
     const panels = [0, 1, 2];
@@ -55,7 +56,7 @@ class World {
 
   initializeRenderer() {
     const renderer = new THREE.WebGLRenderer({
-      antialias: false,
+      antialias: true,
     });
 
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -74,8 +75,27 @@ class World {
     return renderer;
   }
 
+  initializeTextRenderer() {
+    const textRenderer = new CSS2DRenderer();
+
+    textRenderer.setSize(this.width, this.height);
+    textRenderer.domElement.style.position = "absolute";
+    textRenderer.domElement.style.top = "0px";
+    this.context.body.appendChild(textRenderer.domElement);
+
+    return textRenderer;
+  }
+
+  initializeSaintManager() {
+    return new SaintManager(this.context);
+  }
+
   initializeLoader() {
-    return new Loader(this, this.renderer.capabilities.getMaxAnisotropy());
+    return new Loader(
+      this,
+      this.saintManager,
+      this.renderer.capabilities.getMaxAnisotropy()
+    );
   }
 
   initializeScene() {
@@ -122,6 +142,7 @@ class World {
       this.camera,
       this.context,
       this.loader,
+      this.saintManager,
       8.0
     );
   }
@@ -130,8 +151,28 @@ class World {
     return new LightManager(this.scene);
   }
 
+  initializeAudio() {
+    const audioManager = new AudioManager(this.camera);
+    audioManager.play();
+
+    return audioManager;
+  }
+
   initializeClock() {
     return new THREE.Clock();
+  }
+
+  initializeVideo() {
+    const videoManager = new VideoManager(
+      this.scene,
+      this.controls,
+      this.width,
+      this.height,
+      this.context
+    );
+    videoManager.play();
+
+    return videoManager;
   }
 
   onWindowResize() {

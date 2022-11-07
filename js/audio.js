@@ -13,7 +13,6 @@ export class AudioManager {
     this.loader.load("/assets/sounds/choir.ogg", (buffer) => {
       this.sound.setBuffer(buffer);
       this.sound.setLoop(true);
-      this.sound.setVolume(0.25);
       this.sound.play();
     });
   }
