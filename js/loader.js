@@ -2,6 +2,7 @@ import * as THREE from "three";
 
 import { LightManager } from "./lights.js";
 import { GLTFLoader } from "./lib/GLTFLoader.js";
+import { RGBELoader } from "https://unpkg.com/three@0.143.0/examples/jsm/loaders/RGBELoader.js";
 
 export class Loader {
   constructor(world, anisotropy) {
@@ -50,6 +51,7 @@ export class Loader {
 
         if (object.material.map) {
           object.material.map.anisotropy = this.anisotropy;
+          object.material.flatShading = true;
         }
       } else if (object.isLight) {
         LightManager.configureLight(object);

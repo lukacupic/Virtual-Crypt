@@ -9,6 +9,7 @@ import Stats from "https://unpkg.com/three@0.143.0/examples/jsm/libs/stats.modul
 import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
 import { Loader } from "./loader.js";
+import { RGBELoader } from "https://unpkg.com/three@0.143.0/examples/jsm/loaders/RGBELoader.js";
 
 class World {
   constructor() {
@@ -49,7 +50,7 @@ class World {
 
   initializeRenderer() {
     const renderer = new THREE.WebGLRenderer({
-      antialias: true,
+      antialias: false,
     });
 
     renderer.setPixelRatio(window.devicePixelRatio);
@@ -61,7 +62,7 @@ class World {
     renderer.toneMappingExposure = 0.5;
 
     renderer.shadowMap.enabled = true;
-    renderer.shadowMap.type = THREE.BasicShadowMap;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
     this.context.body.appendChild(renderer.domElement);
 
@@ -75,8 +76,15 @@ class World {
   initializeScene() {
     const scene = new THREE.Scene();
 
-    scene.background = "#000000";
-    scene.fog = new THREE.Fog(scene.background, 1, 190);
+    // scene.background = "#000000";
+    // scene.fog = new THREE.Fog(scene.background, 1, 150);
+
+    new RGBELoader().load("/assets/textures/venice.hdr", function (texture) {
+      texture.mapping = THREE.EquirectangularReflectionMapping;
+
+      scene.background = texture;
+      scene.enviroment = texture;
+    });
 
     const planeGeo = new THREE.PlaneGeometry(500, 500);
     const groundMirror = new Reflector(planeGeo, {
