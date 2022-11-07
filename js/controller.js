@@ -76,7 +76,7 @@ export class FirstPersonController {
     this.radius = 2.0;
 
     this.introPosition = new THREE.Vector3(-13, 1, -1000);
-    this.controlsPosition = new THREE.Vector3(-13, 1, -70);
+    this.controlsPosition = new THREE.Vector3(-13, 1, 150);
 
     this.setIntroPosition();
 

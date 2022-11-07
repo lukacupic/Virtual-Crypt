@@ -6,9 +6,14 @@ import { Reflector } from "https://unpkg.com/three@0.143.0/examples/jsm/objects/
 import Stats from "https://unpkg.com/three@0.143.0/examples/jsm/libs/stats.module";
 
 /* Custom */
+/* Custom */
 import { FirstPersonController } from "./controller.js";
 import { LightManager } from "./lights.js";
+import { AudioManager } from "./audio.js";
 import { Loader } from "./loader.js";
+import { VideoManager } from "./video.js";
+import { SaintManager } from "./saints.js";
+
 import { RGBELoader } from "https://unpkg.com/three@0.143.0/examples/jsm/loaders/RGBELoader.js";
 
 class World {
@@ -76,15 +81,15 @@ class World {
   initializeScene() {
     const scene = new THREE.Scene();
 
-    // scene.background = "#000000";
-    // scene.fog = new THREE.Fog(scene.background, 1, 150);
+    new RGBELoader()
+      .setPath("assets/textures/")
+      .load("environment.hdr", (texture) => {
+        // scene.background = 0x000000;
+        // scene.fog = new THREE.Fog(scene.background, 1, 100);
 
-    new RGBELoader().load("/assets/textures/venice.hdr", function (texture) {
-      texture.mapping = THREE.EquirectangularReflectionMapping;
-
-      scene.background = texture;
-      scene.enviroment = texture;
-    });
+        texture.mapping = THREE.EquirectangularReflectionMapping;
+        scene.environment = texture;
+      });
 
     const planeGeo = new THREE.PlaneGeometry(500, 500);
     const groundMirror = new Reflector(planeGeo, {
