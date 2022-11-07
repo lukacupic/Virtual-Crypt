@@ -9,10 +9,15 @@ export class VideoManager {
 
     this.video = document.getElementById("video");
     this.video.addEventListener("ended", () => {
-      this.videoEndListener();
+      // this.videoEndListener();
     });
 
-    this.initialize();
+    // this.initialize();
+
+    // intro bypass
+    document.getElementById("blocker").style.display = "block";
+    this.controls.setControlsPosition();
+    this.controls.enableMovement(true);
   }
 
   initialize() {

@@ -5,14 +5,15 @@ import { GLTFLoader } from "./lib/GLTFLoader.js";
 import { RGBELoader } from "https://unpkg.com/three@0.143.0/examples/jsm/loaders/RGBELoader.js";
 
 export class Loader {
-  constructor(world, anisotropy) {
+  constructor(world, saintManager, anisotropy) {
     this.world = world;
+    this.saintManager = saintManager;
     this.gltfLoader = new GLTFLoader(this.loadingManager);
     this.anisotropy = anisotropy;
   }
 
   async loadModels() {
-    // this.loadPhysicalModel("/assets/models/world.glb", [], [], 0.4);
+    this.loadPhysicalModel("/assets/models/walls.glb", [], [], 0.4);
     this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
   }
 
@@ -51,7 +52,11 @@ export class Loader {
 
         if (object.material.map) {
           object.material.map.anisotropy = this.anisotropy;
-          object.material.flatShading = true;
+        }
+
+        if (this.saintManager.isSaint(object)) {
+          object.material.lightMapIntensity = 10;
+          this.saintManager.saveToSaints(object);
         }
       } else if (object.isLight) {
         LightManager.configureLight(object);
