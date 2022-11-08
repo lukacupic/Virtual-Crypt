@@ -1,43 +1,23 @@
 import * as THREE from "three";
 
 export class VideoManager {
-  constructor(scene, controls, width, height, document) {
+  constructor(scene, controls, document) {
     this.scene = scene;
     this.controls = controls;
-    this.width = width;
-    this.height = height;
 
     this.video = document.getElementById("video");
     this.video.addEventListener("ended", () => {
       this.videoEndListener();
     });
-
-    this.initialize();
-  }
-
-  initialize() {
-    let texture = new THREE.VideoTexture(this.video);
-    texture.encoding = THREE.sRGBEncoding;
-
-    const xsize = 10;
-    const ysize = xsize / (this.width / this.height);
-    const geometry = new THREE.PlaneGeometry(xsize, ysize);
-
-    const material = new THREE.MeshLambertMaterial({
-      map: texture,
-    });
-
-    let mesh = new THREE.Mesh(geometry, material);
-
-    const controlsPosition = this.controls.position;
-    mesh.position.setX(controlsPosition.x);
-    mesh.position.setY(controlsPosition.y + 1.1 * (ysize / 2));
-    mesh.position.setZ(controlsPosition.z - 6);
-
-    this.scene.add(mesh);
   }
 
   videoEndListener() {
+    // remove the video
+    this.video.pause();
+    this.video.removeAttribute("src");
+    this.video.load();
+    this.video.style.display = "none";
+
     // show first text after video
     const titleNext = document.getElementById("title-next");
     titleNext.style.animation = "none";

@@ -166,8 +166,6 @@ class World {
     const videoManager = new VideoManager(
       this.scene,
       this.controls,
-      this.width,
-      this.height,
       this.context
     );
     videoManager.play();
