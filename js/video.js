@@ -18,30 +18,11 @@ export class VideoManager {
     this.video.load();
     this.video.style.display = "none";
 
-    // show first text after video
-    const titleNext = document.getElementById("title-next");
-    titleNext.style.animation = "none";
-    window.requestAnimationFrame(() => {
-      titleNext.style.animation = "fade-intro-text-long 30s";
-      titleNext.style.animationDelay = "0s";
-      titleNext.style.animationFillMode = "forwards";
-    });
-
-    // show second text after video
-    const titleNextNext = document.getElementById("title-next-next");
-    titleNextNext.style.animation = "none";
-    window.requestAnimationFrame(() => {
-      titleNextNext.style.animation = "fade-intro-text-long 30s";
-      titleNextNext.style.animationDelay = "31s";
-      titleNextNext.style.animationFillMode = "forwards";
-    });
-
     // remove the loading screen
     const loadingScreen = document.getElementById("loading-screen");
     loadingScreen.style.animation = "none";
     window.requestAnimationFrame(() => {
       loadingScreen.style.animation = "fade-loading-screen 5s";
-      loadingScreen.style.animationDelay = "62s";
       loadingScreen.style.animationFillMode = "forwards";
     });
 
