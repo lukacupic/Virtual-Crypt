@@ -56,7 +56,7 @@ class World {
 
   initializeRenderer() {
     const renderer = new THREE.WebGLRenderer({
-      antialias: disable,
+      antialias: false,
     });
 
     renderer.setPixelRatio(window.devicePixelRatio);
