@@ -8,8 +8,35 @@ export class Loader {
   constructor(world, saintManager, anisotropy) {
     this.world = world;
     this.saintManager = saintManager;
-    this.gltfLoader = new GLTFLoader(this.loadingManager);
     this.anisotropy = anisotropy;
+
+    const loadingManager = new THREE.LoadingManager();
+    loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
+      const progressBar = document.getElementById("progress-bar");
+      const percentage = ((100 * itemsLoaded) / itemsTotal).toFixed(0);
+      progressBar.innerText = `Učitavanje... (${percentage}%)`;
+    };
+    loadingManager.onLoad = () => {
+      const loadingScreen = document.getElementById("loading-screen");
+      loadingScreen.style.animation = "none";
+      window.requestAnimationFrame(() => {
+        loadingScreen.style.animation = "fade-loading-screen 5s";
+        loadingScreen.style.animationDelay = "5s";
+        loadingScreen.style.animationFillMode = "forwards";
+      });
+
+      const titleElement = document.getElementById("title");
+      titleElement.style.animation = "none";
+      window.requestAnimationFrame(() => {
+        titleElement.style.animation = "fade-out-intro-text 3s";
+        titleElement.style.animationDelay = "0s";
+        titleElement.style.animationFillMode = "forwards";
+      });
+
+      this.world.video.play();
+    };
+
+    this.gltfLoader = new GLTFLoader(loadingManager);
   }
 
   async loadModels() {

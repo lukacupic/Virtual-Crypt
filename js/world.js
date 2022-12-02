@@ -94,7 +94,8 @@ class World {
     return new Loader(
       this,
       this.saintManager,
-      this.renderer.capabilities.getMaxAnisotropy()
+      this.renderer.capabilities.getMaxAnisotropy(),
+      this.video
     );
   }
 
@@ -163,14 +164,7 @@ class World {
   }
 
   initializeVideo() {
-    const videoManager = new VideoManager(
-      this.scene,
-      this.controls,
-      this.context
-    );
-    videoManager.play();
-
-    return videoManager;
+    return new VideoManager(this.scene, this.controls, this.context);
   }
 
   onWindowResize() {
