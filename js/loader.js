@@ -2,7 +2,6 @@ import * as THREE from "three";
 
 import { LightManager } from "./lights.js";
 import { GLTFLoader } from "./lib/GLTFLoader.js";
-import { RGBELoader } from "https://unpkg.com/three@0.143.0/examples/jsm/loaders/RGBELoader.js";
 
 export class Loader {
   constructor(world, saintManager, anisotropy) {
@@ -11,29 +10,42 @@ export class Loader {
     this.anisotropy = anisotropy;
 
     const loadingManager = new THREE.LoadingManager();
+
     loadingManager.onProgress = (url, itemsLoaded, itemsTotal) => {
       const progressBar = document.getElementById("progress-bar");
       const percentage = ((100 * itemsLoaded) / itemsTotal).toFixed(0);
       progressBar.innerText = `Učitavanje... (${percentage}%)`;
     };
+
     loadingManager.onLoad = () => {
-      const loadingScreen = document.getElementById("loading-screen");
-      loadingScreen.style.animation = "none";
-      window.requestAnimationFrame(() => {
-        loadingScreen.style.animation = "fade-loading-screen 5s";
-        loadingScreen.style.animationDelay = "5s";
-        loadingScreen.style.animationFillMode = "forwards";
-      });
+      const progressBar = document.getElementById("progress-bar");
+      progressBar.innerText = `Kliknite za nastavak`;
 
-      const titleElement = document.getElementById("title");
-      titleElement.style.animation = "none";
-      window.requestAnimationFrame(() => {
-        titleElement.style.animation = "fade-out-intro-text 3s";
-        titleElement.style.animationDelay = "0s";
-        titleElement.style.animationFillMode = "forwards";
-      });
+      document.body.addEventListener("mousedown", startOnMouseClick);
 
-      this.world.video.play();
+      function startOnMouseClick() {
+        document.body.removeEventListener("mousedown", startOnMouseClick);
+
+        const loadingScreen = document.getElementById("loading-screen");
+        loadingScreen.style.animation = "none";
+
+        window.requestAnimationFrame(() => {
+          loadingScreen.style.animation = "fade-loading-screen 5s";
+          loadingScreen.style.animationDelay = "5s";
+          loadingScreen.style.animationFillMode = "forwards";
+        });
+
+        const titleElement = document.getElementById("title");
+        titleElement.style.animation = "none";
+        window.requestAnimationFrame(() => {
+          titleElement.style.animation = "fade-out-intro-text 3s";
+          titleElement.style.animationDelay = "0s";
+          titleElement.style.animationFillMode = "forwards";
+        });
+
+        world.video.play();
+        world.audio.play();
+      }
     };
 
     this.gltfLoader = new GLTFLoader(loadingManager);

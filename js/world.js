@@ -35,19 +35,10 @@ class World {
     this.video = this.initializeVideo();
     this.clock = this.initializeClock();
 
-    const stats = Stats();
-    const panels = [0, 1, 2];
-    Array.from(stats.dom.children).forEach((child, index) => {
-      child.style.display = panels.includes(index) ? "inline-block" : "none";
-    });
-    this.context.body.appendChild(stats.dom);
-    this.stats = stats;
-
     window.addEventListener("resize", () => {
       this.onWindowResize();
     });
 
-    // --- FPS CAP FOR PERFORMANCE. TEMPORARY ---
     this.fps = 30;
     this.fpsInterval = 1000 / this.fps;
     this.then = window.performance.now();
@@ -154,8 +145,6 @@ class World {
 
   initializeAudio() {
     const audioManager = new AudioManager(this.camera);
-    audioManager.play();
-
     return audioManager;
   }
 
@@ -174,7 +163,6 @@ class World {
     this.renderer.setSize(this.width, this.height);
   }
 
-  // --- FPS CAP FOR PERFORMANCE. TEMPORARY ---
   animate() {
     requestAnimationFrame((t) => {
       this.now = t;
@@ -186,7 +174,6 @@ class World {
         const delta = this.clock.getDelta();
         this.controls.update(delta);
         this.renderer.render(this.scene, this.camera);
-        this.stats.update();
       }
 
       this.animate();
