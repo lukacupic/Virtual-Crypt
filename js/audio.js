@@ -10,7 +10,7 @@ export class AudioManager {
   }
 
   play() {
-    this.loader.load("/assets/sounds/choir.ogg", (buffer) => {
+    this.loader.load("/assets/sounds/ave-maria.mp3", (buffer) => {
       this.sound.setBuffer(buffer);
       this.sound.setLoop(true);
       this.sound.play();

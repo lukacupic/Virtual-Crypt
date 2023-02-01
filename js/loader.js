@@ -19,7 +19,7 @@ export class Loader {
 
     loadingManager.onLoad = () => {
       const progressBar = document.getElementById("progress-bar");
-      progressBar.innerText = `Kliknite za nastavak`;
+      progressBar.innerText = `Kliknite za početak`;
 
       document.body.addEventListener("mousedown", startOnMouseClick);
 
@@ -37,6 +37,7 @@ export class Loader {
 
         const titleElement = document.getElementById("title");
         titleElement.style.animation = "none";
+
         window.requestAnimationFrame(() => {
           titleElement.style.animation = "fade-out-intro-text 3s";
           titleElement.style.animationDelay = "0s";
@@ -44,7 +45,9 @@ export class Loader {
         });
 
         world.video.play();
-        world.audio.play();
+
+        // start audio when the screen completely fades
+        setTimeout(() => world.audio.play(), 5000);
       }
     };
 
@@ -52,33 +55,20 @@ export class Loader {
   }
 
   async loadModels() {
-    this.loadPhysicalModel("/assets/models/walls.glb", [], [], 0.4);
-    this.loadVisualModel("/assets/models/crypt.glb", [], [], 0.4);
+    this.loadModel("/assets/models/walls.glb", 0.4, true);
+    this.loadModel("/assets/models/crypt.glb", 0.4, false);
   }
 
-  async loadPhysicalModel(modelPath, position, rotation, scale = 1) {
-    const mesh = await this.loadVisualModel(
-      modelPath,
-      position,
-      rotation,
-      scale
-    );
-
-    this.world.controls.worldOctree.fromGraphNode(mesh);
-
-    return mesh;
-  }
-
-  async loadVisualModel(modelPath, position, rotation, scale) {
+  async loadModel(modelPath, scale = 1, physical = false) {
     const model = await this.gltfLoader.loadAsync(modelPath);
 
     let mesh = model.scene;
 
-    mesh.position.set(position[0] || 0, position[1] || 0, position[2] || 0);
+    mesh.position.set(0, 0, 0);
 
-    mesh.rotateX(rotation[0] || 0);
-    mesh.rotateY(rotation[1] || 0);
-    mesh.rotateZ(rotation[2] || 0);
+    mesh.rotateX(0);
+    mesh.rotateY(0);
+    mesh.rotateZ(0);
 
     mesh.scale.set(scale || 1, scale || 1, scale || 1);
 
@@ -102,7 +92,11 @@ export class Loader {
       }
     });
 
-    this.world.scene.add(mesh);
+    if (physical) {
+      this.world.controls.worldOctree.fromGraphNode(mesh);
+    } else {
+      this.world.scene.add(mesh);
+    }
 
     return mesh;
   }
